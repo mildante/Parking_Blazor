@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Parking_Blazor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4033ec3906260cb4892c6c4c4f4fa548e972f198")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f8c7f6b3a947c6c6869fc1cfa05bb0889aa5d30")]
 [assembly: System.Reflection.AssemblyProductAttribute("Parking_Blazor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Parking_Blazor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

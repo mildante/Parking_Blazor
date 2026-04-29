@@ -135,7 +135,7 @@
     {
         message = null;
 
-        var result = await UserRequests.AuthUser(authModel);
+        var result = await UserRequests.GetAuthorizeUser(authModel);
 
         if (result == null)
         {

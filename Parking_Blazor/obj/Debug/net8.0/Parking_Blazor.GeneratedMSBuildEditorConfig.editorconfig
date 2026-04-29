@@ -30,6 +30,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/study/KTITS/uchebka/Parking_Blazor/Parking_Blazor/Pages/AdminParkingPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYXJraW5nUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/study/KTITS/uchebka/Parking_Blazor/Parking_Blazor/Pages/AuthPage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFBhZ2UucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

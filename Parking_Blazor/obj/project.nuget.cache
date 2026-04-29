@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "6bmOIFJXWdE=",
+  "dgSpecHash": "BolzDKwrBzM=",
   "success": true,
   "projectFilePath": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Parking_Blazor.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\milam\\.nuget\\packages\\blazor.localstorage.webassembly\\9.0.1\\blazor.localstorage.webassembly.9.0.1.nupkg.sha512",
+    "C:\\Users\\milam\\.nuget\\packages\\blazor.serialization\\9.0.1\\blazor.serialization.9.0.1.nupkg.sha512",
     "C:\\Users\\milam\\.nuget\\packages\\microsoft.aspnetcore.authorization\\8.0.26\\microsoft.aspnetcore.authorization.8.0.26.nupkg.sha512",
     "C:\\Users\\milam\\.nuget\\packages\\microsoft.aspnetcore.components\\8.0.26\\microsoft.aspnetcore.components.8.0.26.nupkg.sha512",
     "C:\\Users\\milam\\.nuget\\packages\\microsoft.aspnetcore.components.analyzers\\8.0.26\\microsoft.aspnetcore.components.analyzers.8.0.26.nupkg.sha512",

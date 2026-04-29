@@ -2,6 +2,38 @@
   "version": 3,
   "targets": {
     "net8.0": {
+      "Blazor.LocalStorage.WebAssembly/9.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Blazor.Serialization": "9.0.1",
+          "Microsoft.Extensions.DependencyInjection": "8.0.0",
+          "Microsoft.Extensions.Primitives": "8.0.0",
+          "Microsoft.JSInterop": "8.0.0"
+        },
+        "compile": {
+          "lib/net8.0/Blazor.LocalStorage.WebAssembly.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Blazor.LocalStorage.WebAssembly.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Blazor.Serialization/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Blazor.Serialization.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Blazor.Serialization.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.AspNetCore.Authorization/8.0.26": {
         "type": "package",
         "dependencies": {
@@ -452,6 +484,38 @@
       }
     },
     "net8.0/browser-wasm": {
+      "Blazor.LocalStorage.WebAssembly/9.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Blazor.Serialization": "9.0.1",
+          "Microsoft.Extensions.DependencyInjection": "8.0.0",
+          "Microsoft.Extensions.Primitives": "8.0.0",
+          "Microsoft.JSInterop": "8.0.0"
+        },
+        "compile": {
+          "lib/net8.0/Blazor.LocalStorage.WebAssembly.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Blazor.LocalStorage.WebAssembly.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Blazor.Serialization/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Blazor.Serialization.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Blazor.Serialization.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.AspNetCore.Authorization/8.0.26": {
         "type": "package",
         "dependencies": {
@@ -903,6 +967,42 @@
     }
   },
   "libraries": {
+    "Blazor.LocalStorage.WebAssembly/9.0.1": {
+      "sha512": "nw7GxQjQ6PPKBe+6GturW9s+gpkSTi3YZx5twoZFn2RFNf0DazwtyPujIhsa5WUZfQfIUCSbYsxHfkz0feCSPA==",
+      "type": "package",
+      "path": "blazor.localstorage.webassembly/9.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "README.md",
+        "blazor.localstorage.webassembly.9.0.1.nupkg.sha512",
+        "blazor.localstorage.webassembly.nuspec",
+        "lib/net8.0/Blazor.LocalStorage.WebAssembly.dll",
+        "lib/net8.0/Blazor.LocalStorage.WebAssembly.xml",
+        "lib/net9.0/Blazor.LocalStorage.WebAssembly.dll",
+        "lib/net9.0/Blazor.LocalStorage.WebAssembly.xml",
+        "logo.png"
+      ]
+    },
+    "Blazor.Serialization/9.0.1": {
+      "sha512": "RxAfShLvrK/uZozVBAjjl05s1AwL6fSNmv1mCn4iUw629aYqNqejfEk/4tcXe+qdtkfD890MzLovvBj5HVQCYA==",
+      "type": "package",
+      "path": "blazor.serialization/9.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "README.md",
+        "blazor.serialization.9.0.1.nupkg.sha512",
+        "blazor.serialization.nuspec",
+        "lib/net8.0/Blazor.Serialization.dll",
+        "lib/net8.0/Blazor.Serialization.xml",
+        "lib/net9.0/Blazor.Serialization.dll",
+        "lib/net9.0/Blazor.Serialization.xml",
+        "logo.png"
+      ]
+    },
     "Microsoft.AspNetCore.Authorization/8.0.26": {
       "sha512": "6ggoCjsWhDPVDSs7pG2jNdpvHJBMYgxwjZtHvEGGs1oNIvfzyYKxLGSRPJTTJbLjnFUemopvihuhqbt8n572YQ==",
       "type": "package",
@@ -1837,6 +1937,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "Blazor.LocalStorage.WebAssembly >= 9.0.1",
       "Microsoft.AspNetCore.Components.WebAssembly >= 8.0.26",
       "Microsoft.AspNetCore.Components.WebAssembly.DevServer >= 8.0.26",
       "Microsoft.NET.ILLink.Tasks >= 8.0.26",
@@ -1895,6 +1996,10 @@
         "framework": "net8.0",
         "targetAlias": "net8.0",
         "dependencies": {
+          "Blazor.LocalStorage.WebAssembly": {
+            "target": "Package",
+            "version": "[9.0.1, )"
+          },
           "Microsoft.AspNetCore.Components.WebAssembly": {
             "target": "Package",
             "version": "[8.0.26, )"

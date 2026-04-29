@@ -1,0 +1,451 @@
+﻿@page "/admin-parking"
+@using Parking_Blazor.ApiRequests.Models
+@using Parking_Blazor.ApiRequests.Services
+@using static Parking_Blazor.ApiRequests.Models.Parking
+
+@inject ParkingRequests ParkingRequests
+@inject UserService UserService
+@inject NavigationManager Navigation
+
+<PageTitle>Комплексы и места</PageTitle>
+
+@if (UserService.CurrentUser == null || !UserService.isAdmin)
+{
+    <div class="parking-admin-page">
+        <div class="parking-empty">
+            <h3>Доступ запрещён</h3>
+            <p>Эта страница доступна только администратору.</p>
+            <button @onclick="@GoToAuth">Войти</button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="parking-admin-page">
+        <div class="parking-admin-header">
+            <div>
+                <p>Admin panel</p>
+                <h1>Комплексы и парковочные места</h1>
+            </div>
+
+            <button class="parking-main-btn" @onclick="OpenCreateComplex">
+                + Создать комплекс
+            </button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="parking-message @(isSuccess ? "success" : "error")">
+                @message
+            </div>
+        }
+
+        <div class="parking-admin-grid">
+            <section class="parking-card">
+                <div class="parking-card-title">
+                    <h2>Парковочные комплексы</h2>
+                    <span>@complexes.Count</span>
+                </div>
+
+                @if (isLoadingComplexes)
+                {
+                    <div class="parking-empty">Загрузка...</div>
+                }
+                else if (complexes.Count == 0)
+                {
+                    <div class="parking-empty">Комплексы пока не добавлены.</div>
+                }
+                else
+                {
+                    <div class="complex-list">
+                        @foreach (var item in complexes)
+                        {
+                            <div class="complex-item @(selectedComplex?.id_complex == item.id_complex ? "active" : "")"
+                                 @onclick="() => SelectComplex(item)">
+                                <div>
+                                    <h3>@item.name</h3>
+                                    <p>@item.address</p>
+                                </div>
+
+                                <div class="complex-actions" @onclick:stopPropagation="true">
+                                    <button @onclick="() => OpenEditComplex(item)">Изменить</button>
+                                    <button class="delete" @onclick="() => DeleteComplex(item.id_complex)">Удалить</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </section>
+
+            <section class="parking-card">
+                <div class="parking-card-title">
+                    <div>
+                        <h2>Места</h2>
+                        <p>@(selectedComplex == null ? "Выберите комплекс" : selectedComplex.name)</p>
+                    </div>
+
+                    <button class="parking-small-btn" disabled="@(selectedComplex == null)" @onclick="OpenCreateSpot">
+                        + Добавить место
+                    </button>
+                </div>
+
+                @if (selectedComplex == null)
+                {
+                    <div class="parking-empty">Сначала выберите парковочный комплекс слева.</div>
+                }
+                else if (isLoadingSpots)
+                {
+                    <div class="parking-empty">Загрузка мест...</div>
+                }
+                else if (spots.Count == 0)
+                {
+                    <div class="parking-empty">Для этого комплекса места пока не добавлены.</div>
+                }
+                else
+                {
+                    <div class="parking-table-wrap">
+                        <table class="parking-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Номер</th>
+                                    <th>Зона</th>
+                                    <th>Статус</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var spot in spots)
+                                {
+                                    <tr>
+                                        <td>@spot.id_spot</td>
+                                        <td>@spot.number</td>
+                                        <td>@spot.parkingComplex</td>
+                                        <td>
+                                            <span class="status-badge @GetStatusClass(spot.status)">
+                                                @spot.status
+                                            </span>
+                                        </td>
+                                        <td class="table-actions">
+                                            <button @onclick="() => OpenEditSpot(spot)">Изменить</button>
+                                            <button class="delete" @onclick="() => DeleteSpot(spot.id_spot)">Удалить</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </section>
+        </div>
+    </div>
+
+    @if (isComplexModalOpen)
+    {
+        <div class="parking-modal-backdrop">
+            <div class="parking-modal">
+                <button class="modal-close" @onclick="CloseComplexModal">×</button>
+
+                <h2>@(isEditComplexMode ? "Редактирование комплекса" : "Создание комплекса")</h2>
+
+                <label>Название</label>
+                <input @bind="complexForm.name" />
+
+                <label>Адрес</label>
+                <input @bind="complexForm.address" />
+
+                <div class="modal-actions">
+                    <button class="secondary" @onclick="CloseComplexModal">Отмена</button>
+                    <button @onclick="SaveComplex">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (isSpotModalOpen)
+    {
+        <div class="parking-modal-backdrop">
+            <div class="parking-modal">
+                <button class="modal-close" @onclick="CloseSpotModal">×</button>
+
+                <h2>@(isEditSpotMode ? "Редактирование места" : "Добавление места")</h2>
+
+                <label>Номер места</label>
+                <input @bind="spotForm.number" disabled="@isEditSpotMode" />
+
+                <label>Зона</label>
+                <input @bind="spotForm.parkingComplex" disabled="@isEditSpotMode"/>
+
+                <label>Статус</label>
+                <select @bind="spotForm.status">
+                    <option value="Свободно">Свободно</option>
+                    <option value="Занято">Занято</option>
+                </select>
+
+                <div class="modal-actions">
+                    <button class="secondary" @onclick="CloseSpotModal">Отмена</button>
+                    <button @onclick="SaveSpot">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    [Inject] private UserRequests UserRequests { get; set; }
+
+    private List<ParkingComplexModel> complexes = new();
+    private List<ParkingSpotModel> spots = new();
+
+    private ParkingComplexModel? selectedComplex;
+
+    private ParkingComplexModel complexForm = new();
+    private ParkingSpotModel spotForm = new();
+
+    private bool isLoadingComplexes;
+    private bool isLoadingSpots;
+
+    private bool isComplexModalOpen;
+    private bool isEditComplexMode;
+
+    private bool isSpotModalOpen;
+    private bool isEditSpotMode;
+
+    private string? message;
+    private bool isSuccess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UserRequests.LoadUserFromToken();
+
+        if (UserService.CurrentUser == null || !UserService.isAdmin)
+            return;
+
+        await LoadComplexes();
+    }
+
+    private async Task LoadComplexes()
+    {
+        isLoadingComplexes = true;
+
+        var result = await ParkingRequests.GetAllComplexes();
+
+        complexes = result != null && result.status
+            ? result.list
+            : new List<ParkingComplexModel>();
+
+        isLoadingComplexes = false;
+    }
+
+    private async Task SelectComplex(ParkingComplexModel complex)
+    {
+        selectedComplex = complex;
+        await LoadSpots();
+    }
+
+    private async Task LoadSpots()
+    {
+        if (selectedComplex == null)
+            return;
+
+        isLoadingSpots = true;
+
+        var result = await ParkingRequests.GetSpotsByComplex(selectedComplex.id_complex);
+
+        spots = result != null && result.status
+            ? result.list
+            : new List<ParkingSpotModel>();
+
+        isLoadingSpots = false;
+    }
+
+    private void OpenCreateComplex()
+    {
+        isEditComplexMode = false;
+
+        complexForm = new ParkingComplexModel();
+
+        isComplexModalOpen = true;
+    }
+
+    private void OpenEditComplex(ParkingComplexModel complex)
+    {
+        isEditComplexMode = true;
+
+        complexForm = new ParkingComplexModel
+        {
+            id_complex = complex.id_complex,
+            name = complex.name,
+            address = complex.address
+        };
+
+        isComplexModalOpen = true;
+    }
+
+    private async Task SaveComplex()
+    {
+        message = null;
+
+        if (string.IsNullOrWhiteSpace(complexForm.name) || string.IsNullOrWhiteSpace(complexForm.address))
+        {
+            isSuccess = false;
+            message = "Введите название и адрес комплекса";
+            return;
+        }
+
+        var result = isEditComplexMode
+            ? await ParkingRequests.UpdateComplex(complexForm)
+            : await ParkingRequests.CreateComplex(complexForm);
+
+        if (result == null || !result.status)
+        {
+            isSuccess = false;
+            message = result?.message ?? "Не удалось сохранить комплекс";
+            return;
+        }
+
+        await LoadComplexes();
+
+        if (selectedComplex != null)
+        {
+            selectedComplex = complexes.FirstOrDefault(x => x.id_complex == selectedComplex.id_complex);
+        }
+
+        CloseComplexModal();
+
+        isSuccess = true;
+        message = result.message ?? "Комплекс сохранён";
+    }
+
+    private async Task DeleteComplex(int id)
+    {
+        var result = await ParkingRequests.DeleteComplex(id);
+
+        if (result == null || !result.status)
+        {
+            isSuccess = false;
+            message = result?.message ?? "Не удалось удалить комплекс";
+            return;
+        }
+
+        complexes.RemoveAll(x => x.id_complex == id);
+
+        if (selectedComplex?.id_complex == id)
+        {
+            selectedComplex = null;
+            spots.Clear();
+        }
+
+        isSuccess = true;
+        message = result.message ?? "Комплекс удалён";
+    }
+
+    private void CloseComplexModal()
+    {
+        isComplexModalOpen = false;
+    }
+
+    private void OpenCreateSpot()
+    {
+        if (selectedComplex == null)
+            return;
+
+        isEditSpotMode = false;
+
+        spotForm = new ParkingSpotModel
+        {
+            parking_complex_id = selectedComplex.id_complex,
+            status = "Свободно"
+        };
+
+        isSpotModalOpen = true;
+    }
+
+    private void OpenEditSpot(ParkingSpotModel spot)
+    {
+        isEditSpotMode = true;
+
+        spotForm = new ParkingSpotModel
+        {
+            id_spot = spot.id_spot,
+            number = spot.number,
+            status = spot.status,
+            parking_complex_id = spot.parking_complex_id
+        };
+
+        isSpotModalOpen = true;
+    }
+
+    private async Task SaveSpot()
+    {
+        message = null;
+
+        if (selectedComplex == null)
+            return;
+
+        if (string.IsNullOrWhiteSpace(spotForm.number))
+        {
+            isSuccess = false;
+            message = "Введите номер места";
+            return;
+        }
+
+        spotForm.parking_complex_id = selectedComplex.id_complex;
+
+        var result = isEditSpotMode
+    ? await ParkingRequests.UpdateSpotStatus(spotForm.id_spot, spotForm.status)
+    : await ParkingRequests.CreateSpot(spotForm);
+
+        if (result == null || !result.status)
+        {
+            isSuccess = false;
+            message = result?.message ?? "Не удалось сохранить место";
+            return;
+        }
+
+        await LoadSpots();
+        CloseSpotModal();
+
+        isSuccess = true;
+        message = result.message ?? "Место сохранено";
+    }
+
+    private async Task DeleteSpot(int id)
+    {
+        var result = await ParkingRequests.DeleteSpot(id);
+
+        if (result == null || !result.status)
+        {
+            isSuccess = false;
+            message = result?.message ?? "Не удалось удалить место";
+            return;
+        }
+
+        spots.RemoveAll(x => x.id_spot == id);
+
+        isSuccess = true;
+        message = result.message ?? "Место удалено";
+    }
+
+    private void CloseSpotModal()
+    {
+        isSpotModalOpen = false;
+    }
+
+    private string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "Свободно" => "free",
+            "Занято" => "busy",
+            "Забронировано" => "reserved",
+            "Недоступно" => "disabled",
+            _ => ""
+        };
+    }
+
+    private void GoToAuth()
+    {
+        Navigation.NavigateTo("/auth");
+    }
+}
