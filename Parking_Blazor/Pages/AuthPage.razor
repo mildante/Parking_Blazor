@@ -11,90 +11,99 @@
 
 <div class="auth-page">
     <div class="auth-card">
+        <div class="auth-visual">
+            <span class="profile-pill">Parking app</span>
+            <h1>Добро пожаловать</h1>
+            <p>Войдите в аккаунт или зарегистрируйтесь, чтобы управлять своими машинами и парковочными данными.</p>
 
-        <div class="auth-tabs">
-            <button class="auth-tab @(isLogin ? "active" : "")" @onclick="ShowLogin">
-                Вход
-            </button>
-
-            <button class="auth-tab @(!isLogin ? "active" : "")" @onclick="ShowRegistration">
-                Регистрация
-            </button>
+            <div class="auth-accent-card">
+                <div>
+                    <span>Статус</span>
+                    <h3>Свободная парковка</h3>
+                </div>
+                <div class="auth-accent-circle">
+                    <i class="bi bi-car-front-fill"></i>
+                </div>
+            </div>
         </div>
 
-        @if (isLogin)
-        {
-            <div class="auth-form">
-                <h2>Вход в систему</h2>
-                <p>Введите данные для авторизации</p>
+        <div class="auth-form-card">
+            <div class="auth-tabs">
+                <button class="auth-tab @(isLogin ? "active" : "")" @onclick="ShowLogin">
+                    Вход
+                </button>
+                <button class="auth-tab @(!isLogin ? "active" : "")" @onclick="ShowRegistration">
+                    Регистрация
+                </button>
+            </div>
 
-                <div class="form-group">
+            @if (isLogin)
+            {
+                <div class="card-title">
+                    <h2>Вход в систему</h2>
+                    <p>Введите данные для авторизации</p>
+                </div>
+
+                <div class="form-group full">
                     <label>Почта</label>
-                    <input class="auth-input" type="email" @bind="authModel.email" />
+                    <input class="profile-input" @bind="authModel.email" />
                 </div>
 
-                <div class="form-group">
+                <div class="form-group full">
                     <label>Пароль</label>
-                    <input class="auth-input" type="password" @bind="authModel.password" />
+                    <input class="profile-input" type="password" @bind="authModel.password" />
                 </div>
 
-                <button class="auth-btn" @onclick="Login">
+                <button class="primary-btn auth-submit" @onclick="Login">
                     Войти
                 </button>
+            }
+            else
+            {
+                <div class="card-title">
+                    <h2>Регистрация</h2>
+                    <p>Создайте аккаунт для использования парковки</p>
+                </div>
 
-                @if (!string.IsNullOrEmpty(message))
-                {
-                    <div class="auth-message @(isSuccess ? "success" : "error")">
-                        @message
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="auth-form">
-                <h2>Регистрация</h2>
-                <p>Создайте аккаунт для использования парковки</p>
-
-                <div class="form-row">
+                <div class="form-grid">
                     <div class="form-group">
                         <label>Имя</label>
-                        <input class="auth-input" type="text" @bind="registerModel.name" />
+                        <input class="profile-input" @bind="registerModel.name" />
                     </div>
 
                     <div class="form-group">
                         <label>Фамилия</label>
-                        <input class="auth-input" type="text" @bind="registerModel.surname" />
+                        <input class="profile-input" @bind="registerModel.surname" />
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Почта</label>
+                        <input class="profile-input" @bind="registerModel.email" />
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Телефон</label>
+                        <input class="profile-input" @bind="registerModel.phone" />
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Пароль</label>
+                        <input class="profile-input" type="password" @bind="registerModel.password" />
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Почта</label>
-                    <input class="auth-input" type="email" @bind="registerModel.email" />
-                </div>
-
-                <div class="form-group">
-                    <label>Телефон</label>
-                    <input class="auth-input" type="text" @bind="registerModel.phone" />
-                </div>
-
-                <div class="form-group">
-                    <label>Пароль</label>
-                    <input class="auth-input" type="password" @bind="registerModel.password" />
-                </div>
-
-                <button class="auth-btn" @onclick="Registration">
+                <button class="primary-btn auth-submit" @onclick="Registration">
                     Зарегистрироваться
                 </button>
+            }
 
-                @if (!string.IsNullOrEmpty(message))
-                {
-                    <div class="auth-message @(isSuccess ? "success" : "error")">
-                        @message
-                    </div>
-                }
-            </div>
-        }
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="profile-message @(isSuccess ? "success" : "error") auth-message">
+                    @message
+                </div>
+            }
+        </div>
     </div>
 </div>
 
@@ -104,6 +113,7 @@
     private string? message;
 
     private AuthUserRequest authModel = new();
+
     private UserModel registerModel = new()
     {
         role_id = 3
@@ -153,7 +163,6 @@
     private async Task Registration()
     {
         message = null;
-
         registerModel.role_id = 3;
 
         var result = await UserRequests.RegistrationUser(registerModel);

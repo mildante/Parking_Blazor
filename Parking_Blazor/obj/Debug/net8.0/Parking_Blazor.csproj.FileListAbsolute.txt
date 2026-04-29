@@ -1034,6 +1034,7 @@ D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\Parking_Bl
 D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\refint\Parking_Blazor.dll
 D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\Parking_Blazor.pdb
 D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\ref\Parking_Blazor.dll
-D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\z6ticlqjdg-{0}-94vf79wmcg-94vf79wmcg.gz
-D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\ll8a41h2x3-{0}-kmwbjv0d6e-kmwbjv0d6e.gz
-D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\bawz5d4qs8-{0}-mj38n1wr5t-mj38n1wr5t.gz
+D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\Parking_Blazor.sourcelink.json
+D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\z6ticlqjdg-{0}-6ljsoe329i-6ljsoe329i.gz
+D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\ll8a41h2x3-{0}-37wro1656m-37wro1656m.gz
+D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\bawz5d4qs8-{0}-b29dxb64we-b29dxb64we.gz

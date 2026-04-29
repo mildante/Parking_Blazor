@@ -1,32 +1,317 @@
 ﻿@page "/profile"
 @using Parking_Blazor.ApiRequests.Models
+@using Parking_Blazor.ApiRequests.Services
+@using static Parking_Blazor.ApiRequests.Models.User
+@using static Parking_Blazor.ApiRequests.Models.Car
+
 @inject UserService UserService
+@inject UserRequests UserRequests
+@inject CarRequests CarRequests
 @inject NavigationManager Navigation
 
 <PageTitle>Профиль</PageTitle>
 
 @if (UserService.CurrentUser == null)
 {
-    <div>
+    <div class="profile-empty">
         <h3>Вы не авторизованы</h3>
-        <button @onclick="GoToAuth">Войти</button>
+        <p>Для просмотра профиля необходимо войти в аккаунт.</p>
+        <button class="primary-btn" @onclick="GoToAuth">Войти</button>
     </div>
 }
 else
 {
-    <div>
-        <h2>Профиль</h2>
+    <div class="profile-page">
+        <div class="profile-header">
+            <div>
+                <span class="profile-pill">Parking account</span>
+                <h1>Личный кабинет</h1>
+                <p>Профиль, автомобили и данные для парковки</p>
+            </div>
 
-        <p><b>ID:</b> @UserService.CurrentUser.id_user</p>
-        <p><b>Имя:</b> @UserService.CurrentUser.name</p>
-        <p><b>Email:</b> @UserService.CurrentUser.email</p>
-        <p><b>Телефон:</b> @UserService.CurrentUser.phone</p>
+            <button class="logout-btn" @onclick="Logout">
+                Выйти
+            </button>
+        </div>
 
-        <button @onclick="Logout">Выйти</button>
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="profile-message @(isSuccess ? "success" : "error")">
+                @message
+            </div>
+        }
+
+        <div class="profile-grid">
+            <section class="profile-card">
+                <div class="card-title">
+                    <h2>Профиль</h2>
+                    <p>Редактирование личных данных</p>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Имя</label>
+                        <input class="profile-input" @bind="editUser.name" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Фамилия</label>
+                        <input class="profile-input" @bind="editUser.surname" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Почта</label>
+                        <input class="profile-input" @bind="editUser.email" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Телефон</label>
+                        <input class="profile-input" @bind="editUser.phone" />
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Пароль</label>
+                        <input class="profile-input" type="password" @bind="editUser.password" />
+                    </div>
+                </div>
+
+                <button class="primary-btn" @onclick="UpdateProfile">
+                    Сохранить профиль
+                </button>
+            </section>
+
+            <section class="profile-card">
+                <div class="card-title row-title">
+                    <div>
+                        <h2>Мои машины</h2>
+                        <p>Просмотр, добавление, редактирование и удаление автомобилей</p>
+                    </div>
+
+                    <button class="small-primary-btn" @onclick="OpenCreateCar">
+                        Добавить
+                    </button>
+                </div>
+
+                @if (cars == null)
+                {
+                    <p class="empty-text">Загрузка...</p>
+                }
+                else if (cars.Count == 0)
+                {
+                    <p class="empty-text">У вас пока нет добавленных машин.</p>
+                }
+                else
+                {
+                    <div class="cars-list">
+                        @foreach (var car in cars)
+                        {
+                            <div class="car-card">
+                                <div>
+                                    <h3>@car.license_plate</h3>
+                                    <p>@car.brand @car.model</p>
+                                    <span>@car.color</span>
+                                </div>
+
+                                <div class="car-actions">
+                                    <button class="edit-btn" @onclick="() => OpenEditCar(car)">Редактировать</button>
+                                    <button class="delete-btn" @onclick="() => DeleteCar(car.id_car)">Удалить</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </section>
+        </div>
     </div>
+
+    @if (isCarModalOpen)
+    {
+        <div class="modal-backdrop">
+            <div class="car-modal">
+                <div class="modal-header">
+                    <h2>@(isEditCarMode ? "Редактирование машины" : "Добавление машины")</h2>
+                    <button class="modal-close" @onclick="CloseCarModal">×</button>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Гос. номер</label>
+                        <input class="profile-input" @bind="carForm.license_plate" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Марка</label>
+                        <input class="profile-input" @bind="carForm.brand" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Модель</label>
+                        <input class="profile-input" @bind="carForm.model" />
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Цвет</label>
+                        <input class="profile-input" @bind="carForm.color" />
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="secondary-btn" @onclick="CloseCarModal">Отмена</button>
+                    <button class="primary-btn" @onclick="SaveCar">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @code {
+    private UserModel editUser = new();
+    private List<CarModel>? cars;
+
+    private CarModel carForm = new();
+    private bool isCarModalOpen;
+    private bool isEditCarMode;
+
+    private string? message;
+    private bool isSuccess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserService.CurrentUser == null)
+            return;
+
+        editUser = CopyUser(UserService.CurrentUser);
+        await LoadCars();
+    }
+
+    private async Task LoadCars()
+    {
+        var result = await CarRequests.GetCarsByUser(UserService.CurrentUser!.id_user);
+
+        if (result != null && result.status)
+            cars = result.list;
+        else
+            cars = new List<CarModel>();
+    }
+
+    private async Task UpdateProfile()
+    {
+        message = null;
+
+        var result = await UserRequests.UpdateUser(editUser);
+
+        if (result == null || !result.status)
+        {
+            isSuccess = false;
+            message = result?.message ?? "Не удалось обновить профиль";
+            return;
+        }
+
+        UserService.CurrentUser = result.user ?? editUser;
+        UserService.Notify();
+
+        editUser = CopyUser(UserService.CurrentUser);
+
+        isSuccess = true;
+        message = result.message ?? "Профиль успешно обновлен";
+    }
+
+    private void OpenCreateCar()
+    {
+        isEditCarMode = false;
+
+        carForm = new CarModel
+        {
+            user_id = UserService.CurrentUser!.id_user
+        };
+
+        isCarModalOpen = true;
+    }
+
+    private void OpenEditCar(CarModel car)
+    {
+        isEditCarMode = true;
+
+        carForm = new CarModel
+        {
+            id_car = car.id_car,
+            license_plate = car.license_plate,
+            brand = car.brand,
+            model = car.model,
+            color = car.color,
+            user_id = car.user_id
+        };
+
+        isCarModalOpen = true;
+    }
+
+    private async Task SaveCar()
+    {
+        message = null;
+
+        if (string.IsNullOrWhiteSpace(carForm.license_plate))
+        {
+            isSuccess = false;
+            message = "Введите гос. номер машины";
+            return;
+        }
+
+        carForm.user_id = UserService.CurrentUser!.id_user;
+
+        var result = isEditCarMode
+            ? await CarRequests.UpdateCar(carForm)
+            : await CarRequests.CreateCar(carForm);
+
+        if (result == null || !result.status)
+        {
+            isSuccess = false;
+            message = result?.message ?? "Не удалось сохранить машину";
+            return;
+        }
+
+        await LoadCars();
+        CloseCarModal();
+
+        isSuccess = true;
+        message = result.message ?? "Данные машины сохранены";
+    }
+
+    private async Task DeleteCar(int carId)
+    {
+        var result = await CarRequests.DeleteCar(carId);
+
+        if (result == null || !result.status)
+        {
+            isSuccess = false;
+            message = result?.message ?? "Не удалось удалить машину";
+            return;
+        }
+
+        cars?.RemoveAll(x => x.id_car == carId);
+
+        isSuccess = true;
+        message = result.message ?? "Машина удалена";
+    }
+
+    private void CloseCarModal()
+    {
+        isCarModalOpen = false;
+    }
+
+    private UserModel CopyUser(UserModel user)
+    {
+        return new UserModel
+        {
+            id_user = user.id_user,
+            name = user.name,
+            surname = user.surname,
+            email = user.email,
+            phone = user.phone,
+            password = user.password,
+            role_id = user.role_id
+        };
+    }
+
     private void GoToAuth()
     {
         Navigation.NavigateTo("/auth");
