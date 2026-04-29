@@ -1,0 +1,41 @@
+﻿@page "/profile"
+@using Parking_Blazor.ApiRequests.Models
+@inject UserService UserService
+@inject NavigationManager Navigation
+
+<PageTitle>Профиль</PageTitle>
+
+@if (UserService.CurrentUser == null)
+{
+    <div>
+        <h3>Вы не авторизованы</h3>
+        <button @onclick="GoToAuth">Войти</button>
+    </div>
+}
+else
+{
+    <div>
+        <h2>Профиль</h2>
+
+        <p><b>ID:</b> @UserService.CurrentUser.id_user</p>
+        <p><b>Имя:</b> @UserService.CurrentUser.name</p>
+        <p><b>Email:</b> @UserService.CurrentUser.email</p>
+        <p><b>Телефон:</b> @UserService.CurrentUser.phone</p>
+
+        <button @onclick="Logout">Выйти</button>
+    </div>
+}
+
+@code {
+    private void GoToAuth()
+    {
+        Navigation.NavigateTo("/auth");
+    }
+
+    private void Logout()
+    {
+        UserService.CurrentUser = null;
+        UserService.Notify();
+        Navigation.NavigateTo("/auth");
+    }
+}
