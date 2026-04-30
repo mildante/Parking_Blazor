@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject Parking_Blazor.ApiRequests.Services.UserRequests UserRequests
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -14,3 +16,10 @@
         </article>
     </main>
 </div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await UserRequests.LoadUserFromToken();
+    }
+}

@@ -47,7 +47,7 @@ namespace Parking_Blazor.ApiRequests.Services
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var response = await _httpClient.GetAsync("/authUserByToken");
+            var response = await _httpClient.GetAsync("/authByToken");
 
             if (!response.IsSuccessStatusCode)
             {

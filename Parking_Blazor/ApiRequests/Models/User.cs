@@ -8,7 +8,7 @@ namespace Parking_Blazor.ApiRequests.Models
 
         public bool isAdmin => CurrentUser?.role_id == 1;
         public bool isOperator => CurrentUser?.role_id == 2;
-        public bool isUser => CurrentUser?.role_id == 3;
+        public bool isUser => CurrentUser?.role_id == 4;
 
         public Action? OnAuthStateChanged { get; set; }
 

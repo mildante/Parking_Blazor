@@ -770,7 +770,6 @@ code {
 .table-actions {
     display: flex;
     gap: 8px;
-    margin-top: 14px;
 }
 
     .complex-actions button,

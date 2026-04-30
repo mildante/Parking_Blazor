@@ -109,7 +109,6 @@ else
                                 <tr>
                                     <th>ID</th>
                                     <th>Номер</th>
-                                    <th>Зона</th>
                                     <th>Статус</th>
                                     <th></th>
                                 </tr>
@@ -120,7 +119,6 @@ else
                                     <tr>
                                         <td>@spot.id_spot</td>
                                         <td>@spot.number</td>
-                                        <td>@spot.parkingComplex</td>
                                         <td>
                                             <span class="status-badge @GetStatusClass(spot.status)">
                                                 @spot.status
@@ -173,8 +171,8 @@ else
                 <label>Номер места</label>
                 <input @bind="spotForm.number" disabled="@isEditSpotMode" />
 
-                <label>Зона</label>
-                <input @bind="spotForm.parkingComplex" disabled="@isEditSpotMode"/>
+                <label>Комплекс</label>
+                <input value="@selectedComplex?.name" disabled />
 
                 <label>Статус</label>
                 <select @bind="spotForm.status">
@@ -393,8 +391,8 @@ else
         spotForm.parking_complex_id = selectedComplex.id_complex;
 
         var result = isEditSpotMode
-    ? await ParkingRequests.UpdateSpotStatus(spotForm.id_spot, spotForm.status)
-    : await ParkingRequests.CreateSpot(spotForm);
+            ? await ParkingRequests.UpdateSpotStatus(spotForm.id_spot, spotForm.status)
+            : await ParkingRequests.CreateSpot(spotForm);
 
         if (result == null || !result.status)
         {
@@ -408,6 +406,8 @@ else
 
         isSuccess = true;
         message = result.message ?? "Место сохранено";
+
+        StateHasChanged();
     }
 
     private async Task DeleteSpot(int id)
@@ -430,6 +430,7 @@ else
     private void CloseSpotModal()
     {
         isSpotModalOpen = false;
+        StateHasChanged();
     }
 
     private string GetStatusClass(string status)
@@ -437,10 +438,7 @@ else
         return status switch
         {
             "Свободно" => "free",
-            "Занято" => "busy",
-            "Забронировано" => "reserved",
-            "Недоступно" => "disabled",
-            _ => ""
+            "Занято" => "busy"
         };
     }
 

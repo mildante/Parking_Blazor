@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "Parking_Blazor",
   "resources": {
-    "hash": "sha256-wZ04Wf1ui0ZXElpJQ6YvIn+lxGHE+3dk1B8ZdaaaOp4=",
+    "hash": "sha256-cAB8DBRws7ZWlEDIxIbLlIdA5lJtp0EfvE2XxjBbdJQ=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-nElGk+CZFyq0PbPm4JU8avD6lER7x9Z1C54BK7qY12Q="
     },
@@ -211,10 +211,10 @@
       "mscorlib.wasm": "sha256-UzRTTeY8BezBltrUF59UgvVNxbmnZS3LeowarsPY8+Y=",
       "netstandard.wasm": "sha256-xHQSNwqHm8E9DM86qW7CTJoRXXsQuGmPeNipDwQFNr8=",
       "System.Private.CoreLib.wasm": "sha256-N9/Djwpe2mX4HdyhCGu9jrxG/DSYKoTPbtsIOv6VFDk=",
-      "Parking_Blazor.wasm": "sha256-EGDkPUL65mgcZv800Baj6pnFFVIw6U1NUtd9P3tWUno="
+      "Parking_Blazor.wasm": "sha256-Pk51AjsqF5no8BFL5iUnktl0MZddsWGchuct6QndJ90="
     },
     "pdb": {
-      "Parking_Blazor.pdb": "sha256-V7M2qdOlxuGC5TfteqV0LGptB2y9K7jpSipgAbq1+zc="
+      "Parking_Blazor.pdb": "sha256-60GBc8UmDuDR4HhMRPE3oHKSYazOGC6Tr6gCbisQR9E="
     }
   },
   "cacheBootResources": true,

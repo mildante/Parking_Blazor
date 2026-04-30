@@ -317,10 +317,9 @@ else
         Navigation.NavigateTo("/auth");
     }
 
-    private void Logout()
+    private async Task Logout()
     {
-        UserService.CurrentUser = null;
-        UserService.Notify();
+        await UserRequests.Logout();
         Navigation.NavigateTo("/auth");
     }
 }
