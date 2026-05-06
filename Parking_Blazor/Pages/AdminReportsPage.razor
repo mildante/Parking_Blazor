@@ -1,0 +1,269 @@
+@page "/admin-reports"
+@using Parking_Blazor.ApiRequests.Models
+@using Parking_Blazor.ApiRequests.Services
+@using static Parking_Blazor.ApiRequests.Models.Report
+
+@inject UserService UserService
+@inject UserRequests UserRequests
+@inject ReportRequests ReportRequests
+@inject NavigationManager Navigation
+
+<PageTitle>Отчеты</PageTitle>
+
+<div class="reports-page">
+    <section class="reports-header">
+        <div>
+            <span class="profile-pill">Analytics</span>
+            <h1>Отчеты</h1>
+            <p>Загрузка парковок, поток машин, среднее время, выручка и абонентская база.</p>
+        </div>
+
+        <div class="reports-period">
+            <select class="profile-input" @bind="selectedDays" @bind:after="ReloadData">
+                <option value="7">7 дней</option>
+                <option value="30">30 дней</option>
+                <option value="90">90 дней</option>
+                <option value="365">Год</option>
+            </select>
+            <button class="small-primary-btn" @onclick="ReloadData">Обновить</button>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="profile-message error">
+            @message
+        </div>
+    }
+
+    @if (UserService.CurrentUser == null || !UserService.isAdmin)
+    {
+        <section class="profile-card reports-auth-card">
+            <div class="card-title">
+                <h2>Доступ запрещен</h2>
+                <p>Отчеты доступны только администратору.</p>
+            </div>
+
+            <button class="primary-btn" @onclick="GoToAuth">Войти</button>
+        </section>
+    }
+    else if (isLoading)
+    {
+        <section class="profile-card">
+            <p class="empty-text">Загрузка отчетов...</p>
+        </section>
+    }
+    else if (report == null)
+    {
+        <section class="profile-card">
+            <p class="empty-text">Данные отчета недоступны.</p>
+        </section>
+    }
+    else
+    {
+        <section class="reports-summary-grid">
+            <div class="report-metric-card">
+                <span>Загрузка мест</span>
+                <strong>@report.summary.occupancyPercent.ToString("0.#")%</strong>
+                <p>@report.summary.busySpots занято из @report.summary.totalSpots</p>
+            </div>
+
+            <div class="report-metric-card">
+                <span>Парковки</span>
+                <strong>@report.summary.totalSessions</strong>
+                <p>@report.summary.activeSessions активных, @report.summary.completedSessions завершенных</p>
+            </div>
+
+            <div class="report-metric-card">
+                <span>Среднее время</span>
+                <strong>@FormatMinutes(report.summary.averageParkingMinutes)</strong>
+                <p>по парковочным сессиям периода</p>
+            </div>
+
+            <div class="report-metric-card">
+                <span>Выручка</span>
+                <strong>@TotalRevenue.ToString("0.##") ₽</strong>
+                <p>парковки @report.summary.parkingRevenue.ToString("0.##") ₽, абонементы @report.summary.subscriptionRevenue.ToString("0.##") ₽</p>
+            </div>
+
+            <div class="report-metric-card">
+                <span>Абоненты</span>
+                <strong>@report.summary.subscribersCount</strong>
+                <p>@report.summary.activeSubscriptions активных абонементов</p>
+            </div>
+
+            <div class="report-metric-card">
+                <span>Комплексы</span>
+                <strong>@report.summary.totalComplexes</strong>
+                <p>@report.summary.freeSpots свободных мест сейчас</p>
+            </div>
+        </section>
+
+        <div class="reports-grid">
+            <section class="profile-card">
+                <div class="card-title">
+                    <h2>Загрузка комплексов</h2>
+                    <p>Текущая занятость и поток машин за выбранный период</p>
+                </div>
+
+                @if (report.complexLoads.Count == 0)
+                {
+                    <p class="empty-text">Комплексы пока не добавлены.</p>
+                }
+                else
+                {
+                    <div class="complex-load-list">
+                        @foreach (var item in report.complexLoads)
+                        {
+                            <div class="complex-load-item">
+                                <div class="complex-load-title">
+                                    <div>
+                                        <h3>@item.complexName</h3>
+                                        <p>@item.sessionsCount парковок, @item.parkingRevenue.ToString("0.##") ₽</p>
+                                    </div>
+                                    <strong>@item.occupancyPercent.ToString("0.#")%</strong>
+                                </div>
+
+                                <div class="report-progress">
+                                    <span style="width: @GetProgressWidth(item.occupancyPercent)"></span>
+                                </div>
+
+                                <div class="complex-load-meta">
+                                    <span>Всего @item.totalSpots</span>
+                                    <span>Свободно @item.freeSpots</span>
+                                    <span>Занято @item.busySpots</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </section>
+
+            <section class="profile-card">
+                <div class="card-title">
+                    <h2>Динамика по дням</h2>
+                    <p>Количество парковок и выручка</p>
+                </div>
+
+                @if (report.dailyStats.Count == 0)
+                {
+                    <p class="empty-text">Данных за период нет.</p>
+                }
+                else
+                {
+                    <div class="daily-chart">
+                        @foreach (var day in report.dailyStats)
+                        {
+                            <div class="daily-chart-column">
+                                <div class="daily-chart-bar" style="height: @GetBarHeight(day.sessionsCount)">
+                                    <span>@day.sessionsCount</span>
+                                </div>
+                                <small>@day.date.ToString("dd.MM")</small>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="parking-table-wrap reports-table-wrap">
+                        <table class="parking-table">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Парковки</th>
+                                    <th>Среднее время</th>
+                                    <th>Парковки, ₽</th>
+                                    <th>Абонементы, ₽</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var day in report.dailyStats.OrderByDescending(x => x.date))
+                                {
+                                    <tr>
+                                        <td>@day.date.ToString("dd.MM.yyyy")</td>
+                                        <td>@day.sessionsCount</td>
+                                        <td>@FormatMinutes(day.averageParkingMinutes)</td>
+                                        <td>@day.parkingRevenue.ToString("0.##")</td>
+                                        <td>@day.subscriptionRevenue.ToString("0.##")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </section>
+        </div>
+    }
+</div>
+
+@code {
+    private AdminReportModel? report;
+    private int selectedDays = 30;
+    private string? message;
+    private bool isLoading = true;
+
+    private decimal TotalRevenue => (report?.summary.parkingRevenue ?? 0) + (report?.summary.subscriptionRevenue ?? 0);
+    private int MaxDailySessions => Math.Max(1, report?.dailyStats.Max(x => x.sessionsCount) ?? 1);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UserRequests.LoadUserFromToken();
+
+        if (UserService.CurrentUser != null && UserService.isAdmin)
+            await ReloadData();
+        else
+            isLoading = false;
+    }
+
+    private async Task ReloadData()
+    {
+        isLoading = true;
+        message = null;
+
+        var result = await ReportRequests.GetAdminReport(selectedDays);
+
+        if (result == null || !result.status)
+        {
+            report = null;
+            message = result?.message ?? "Не удалось загрузить отчет";
+        }
+        else
+        {
+            report = result.report;
+        }
+
+        isLoading = false;
+    }
+
+    private void GoToAuth()
+    {
+        Navigation.NavigateTo("/auth");
+    }
+
+    private string GetProgressWidth(decimal percent)
+    {
+        return $"{Math.Clamp(percent, 0, 100):0.#}%";
+    }
+
+    private string GetBarHeight(int sessionsCount)
+    {
+        var height = Math.Max(12, sessionsCount * 100 / MaxDailySessions);
+        return $"{height}%";
+    }
+
+    private static string FormatMinutes(decimal minutes)
+    {
+        if (minutes <= 0)
+            return "0 мин";
+
+        var rounded = (int)Math.Round(minutes);
+        var hours = rounded / 60;
+        var restMinutes = rounded % 60;
+
+        if (hours == 0)
+            return $"{restMinutes} мин";
+
+        if (restMinutes == 0)
+            return $"{hours} ч";
+
+        return $"{hours} ч {restMinutes} мин";
+    }
+}

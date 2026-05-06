@@ -119,6 +119,14 @@
         role_id = 3
     };
 
+    protected override async Task OnInitializedAsync()
+    {
+        await UserRequests.LoadUserFromToken();
+
+        if (UserService.CurrentUser != null)
+            Navigation.NavigateTo("/", replace: true);
+    }
+
     private void ShowLogin()
     {
         isLogin = true;

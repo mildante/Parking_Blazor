@@ -23,5 +23,7 @@ builder.Services.AddScoped<CarRequests>();
 builder.Services.AddScoped<ParkingRequests>();
 builder.Services.AddScoped<SubscriptionRequests>();
 builder.Services.AddScoped<ParkingSessionRequests>();
+builder.Services.AddScoped<ParkingRealtimeService>();
+builder.Services.AddScoped<ReportRequests>();
 
 await builder.Build().RunAsync();

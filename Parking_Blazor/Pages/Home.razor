@@ -1,7 +1,851 @@
 ﻿@page "/"
+@implements IAsyncDisposable
+@using Parking_Blazor.ApiRequests.Models
+@using Parking_Blazor.ApiRequests.Services
+@using static Parking_Blazor.ApiRequests.Models.Car
+@using static Parking_Blazor.ApiRequests.Models.Parking
+@using static Parking_Blazor.ApiRequests.Models.ParkingSession
+@using static Parking_Blazor.ApiRequests.Models.Subscription
+@using static Parking_Blazor.ApiRequests.Models.User
 
-<PageTitle>Home</PageTitle>
+@inject UserService UserService
+@inject UserRequests UserRequests
+@inject CarRequests CarRequests
+@inject ParkingRequests ParkingRequests
+@inject ParkingSessionRequests ParkingSessionRequests
+@inject SubscriptionRequests SubscriptionRequests
+@inject ParkingRealtimeService RealtimeService
+@inject NavigationManager Navigation
 
-<h1>Hello, world!</h1>
+<PageTitle>Парковка</PageTitle>
 
-Welcome to your new app.
+<div class="parking-dashboard">
+    <section class="parking-hero-panel">
+        <div>
+            <span class="profile-pill">Real-time parking</span>
+            <h1>Управление въездом и выездом</h1>
+            <p>Оформляйте парковку через приложение, отслеживайте свободные места и получайте обновления без перезагрузки страницы.</p>
+        </div>
+
+        <div class="parking-hero-stats">
+            <div>
+                <span>Свободно</span>
+                <strong>@FreeSpotsCount</strong>
+            </div>
+            <div>
+                <span>Занято</span>
+                <strong>@BusySpotsCount</strong>
+            </div>
+            <div>
+                <span>Сессий</span>
+                <strong>@activeSessions.Count</strong>
+            </div>
+        </div>
+    </section>
+
+    @foreach (var notification in notifications)
+    {
+        <div class="profile-message success">
+            @notification
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="profile-message @(isSuccess ? "success" : "error")">
+            @message
+        </div>
+    }
+
+    <div class="parking-workspace @(IsGuest ? "guest-workspace" : "")">
+        <section class="profile-card parking-entry-card quick-payment-card">
+            <div class="card-title row-title quick-payment-title">
+                <div>
+                    <h2>Быстрая оплата</h2>
+                    <p>@EntryModeText</p>
+                </div>
+                <button class="small-primary-btn" @onclick="ReloadData">Обновить</button>
+            </div>
+
+            <div class="quick-payment-grid">
+                @if (UserService.CurrentUser == null)
+                {
+                    <div class="form-group full">
+                        <label>Госномер</label>
+                        <input class="profile-input plate-input" placeholder="A 000 AA 000" @bind="guestLicensePlate" @bind:event="oninput" />
+                    </div>
+                }
+                else if (IsCurrentUserClient)
+                {
+                    <div class="form-group full">
+                        <label>Пользователь</label>
+                        <input class="profile-input" value="@GetUserTitle(UserService.CurrentUser)" disabled />
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Автомобиль</label>
+                        <select class="profile-input" @bind="entryForm.car_id">
+                            <option value="0">Выберите автомобиль</option>
+                            @foreach (var car in selectedUserCars)
+                            {
+                                <option value="@car.id_car">@GetCarTitle(car)</option>
+                            }
+                        </select>
+                    </div>
+                }
+                else
+                {
+
+                    <div class="form-group full">
+                        <label>Пользователь</label>
+                        <select class="profile-input" @bind="selectedUserId" @bind:after="OnUserChanged">
+                            <option value="0">Выберите пользователя</option>
+                            @foreach (var user in users)
+                            {
+                                <option value="@user.id_user">@GetUserTitle(user)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Автомобиль</label>
+                        <select class="profile-input" @bind="entryForm.car_id">
+                            <option value="0">Выберите автомобиль</option>
+                            @foreach (var car in selectedUserCars)
+                            {
+                                <option value="@car.id_car">@GetCarTitle(car)</option>
+                            }
+                        </select>
+                    </div>
+                }
+
+                <div class="form-group">
+                    <label>Парковочный комплекс</label>
+                    <select class="profile-input" @bind="selectedComplexId" @bind:after="OnComplexChanged">
+                        <option value="0">Выберите комплекс</option>
+                        @foreach (var complex in complexes)
+                        {
+                            <option value="@complex.id_complex">@complex.name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Свободное место</label>
+                    <select class="profile-input" @bind="entryForm.parking_spot_id">
+                        <option value="0">Выберите место</option>
+                        @foreach (var spot in FreeSpots)
+                        {
+                            <option value="@spot.id_spot">Место @spot.number</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Длительность парковки</label>
+                    <div class="duration-control">
+                        <input class="profile-input" type="number" min="0" max="24" @bind="durationHours" @bind:event="oninput" />
+                        <span>ч</span>
+                        <input class="profile-input" type="number" min="0" max="59" step="15" @bind="durationMinutes" @bind:event="oninput" />
+                        <span>мин</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Стоимость</label>
+                    <div class="price-preview">@ParkingPrice.ToString("0.##") ₽</div>
+                </div>
+            </div>
+
+            <div class="payment-methods">
+                <label>Способ оплаты</label>
+                <div class="payment-method-grid">
+                    <button type="button" class="payment-method @(paymentMethod == TerminalPayment ? "active" : "")" @onclick="() => SelectPayment(TerminalPayment)">
+                        <span>Терминал</span>
+                        <small>Заглушка оплаты</small>
+                    </button>
+
+                    @if (CanUseSubscriptionPayment)
+                    {
+                        <button type="button" class="payment-method @(paymentMethod == SubscriptionPayment ? "active" : "")" @onclick="() => SelectPayment(SubscriptionPayment)">
+                            <span>Абонемент</span>
+                            <small>@SelectedSubscriptionDescription</small>
+                        </button>
+                    }
+                </div>
+            </div>
+
+            @if (CanUseSubscriptionPayment && paymentMethod == SubscriptionPayment)
+            {
+                <div class="form-group full subscription-select">
+                    <label>Доступный абонемент</label>
+                    <select class="profile-input" @bind="selectedSubscriptionId">
+                        @foreach (var subscription in AvailableSubscriptions)
+                        {
+                            <option value="@subscription.id_subscription">@GetSubscriptionTitle(subscription)</option>
+                        }
+                    </select>
+                </div>
+            }
+
+            <div class="quick-payment-summary">
+                <div>
+                    <span>Время на парковке</span>
+                    <strong>@EntryPeriodText</strong>
+                </div>
+                <div>
+                    <span>К оплате</span>
+                    <strong>@(paymentMethod == SubscriptionPayment ? "0" : ParkingPrice.ToString("0.##")) ₽</strong>
+                </div>
+            </div>
+
+            <button class="primary-btn auth-submit" @onclick="OpenPaymentModal" disabled="@isEntrySubmitting">
+                Оплатить парковку
+            </button>
+        </section>
+
+        @if (!IsGuest)
+        {
+            <section class="profile-card">
+                <div class="card-title">
+                    <h2>Активные парковки</h2>
+                    <p>Выезд освобождает место и обновляет схему парковки</p>
+                </div>
+
+                <div class="form-group full session-search">
+                    <label>Поиск по номеру</label>
+                    <input class="profile-input" placeholder="Например А123ВС" @bind="sessionSearch" @bind:event="oninput" />
+                </div>
+
+                @if (isLoading)
+                {
+                    <p class="empty-text">Загрузка...</p>
+                }
+                else if (!FilteredSessions.Any())
+                {
+                    <p class="empty-text">Активных парковочных сессий нет.</p>
+                }
+                else
+                {
+                    <div class="parking-session-list">
+                        @foreach (var session in FilteredSessions)
+                        {
+                            <div class="parking-session-card">
+                                <div>
+                                    <h3>@session.car?.license_plate</h3>
+                                    <p>@session.parkingComplex?.name, место @session.parkingSpot?.number</p>
+                                    <span>Въезд: @session.entry_time.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                                    @if (session.exit_time != null)
+                                    {
+                                        <span>Оплачено до: @session.exit_time.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                                    }
+                                </div>
+
+                                @if (CanCloseSession(session))
+                                {
+                                    <button class="delete-btn" @onclick="() => CloseSession(session.id_session)">
+                                        Зафиксировать выезд
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </section>
+        }
+    </div>
+
+    <section class="profile-card parking-map-card">
+        <div class="card-title row-title">
+            <div>
+                <h2>Места</h2>
+                <p>@(selectedComplexId == 0 ? "Выберите комплекс выше" : SelectedComplexName)</p>
+            </div>
+        </div>
+
+        @if (selectedComplexId == 0)
+        {
+            <p class="empty-text">После выбора комплекса здесь появится схема мест.</p>
+        }
+        else if (spots.Count == 0)
+        {
+            <p class="empty-text">В выбранном комплексе пока нет мест.</p>
+        }
+        else
+        {
+            <div class="parking-spot-grid">
+                @foreach (var spot in spots)
+                {
+                    <div class="parking-spot-tile @(IsFree(spot) ? "free" : "busy")">
+                        <span>@spot.number</span>
+                        <strong>@spot.status</strong>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+
+</div>
+
+@if (showPaymentModal)
+{
+    <div class="modal-backdrop">
+        <div class="car-modal payment-confirm-modal">
+            <div class="modal-header">
+                <h2>Подтверждение оплаты</h2>
+                <button class="modal-close" @onclick="ClosePaymentModal">×</button>
+            </div>
+
+            <div class="payment-confirm-body">
+                <div>
+                    <span>Парковка</span>
+                    <strong>@SelectedComplexName</strong>
+                </div>
+                <div>
+                    <span>Место</span>
+                    <strong>@SelectedSpotTitle</strong>
+                </div>
+                <div>
+                    <span>Автомобиль</span>
+                    <strong>@PaymentCarTitle</strong>
+                </div>
+                <div>
+                    <span>Период</span>
+                    <strong>@EntryPeriodText</strong>
+                </div>
+                <div>
+                    <span>Способ оплаты</span>
+                    <strong>@PaymentMethodTitle</strong>
+                </div>
+                <div>
+                    <span>К оплате</span>
+                    <strong>@(paymentMethod == SubscriptionPayment ? "0" : ParkingPrice.ToString("0.##")) ₽</strong>
+                </div>
+            </div>
+
+            <div class="terminal-stub">
+                @if (paymentMethod == TerminalPayment)
+                {
+                    <span>Оплата через терминал</span>
+                    <p>Это заглушка оплаты. После подтверждения парковка будет считаться оплаченной.</p>
+                }
+                else
+                {
+                    <span>Оплата по абонементу</span>
+                    <p>@SelectedSubscriptionDescription</p>
+                }
+            </div>
+
+            <div class="modal-actions">
+                <button class="secondary-btn payment-modal-cancel" @onclick="ClosePaymentModal">Отмена</button>
+                <button class="primary-btn payment-modal-confirm" @onclick="StartEntry" disabled="@isEntrySubmitting">
+                    @(isEntrySubmitting ? "Оформляем..." : "Подтвердить оплату")
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private const string TerminalPayment = "terminal";
+    private const string SubscriptionPayment = "subscription";
+    private const decimal HourPrice = 30m;
+
+    private readonly ParkingSessionModel entryForm = new();
+
+    private List<UserModel> users = new();
+    private List<CarModel> selectedUserCars = new();
+    private List<ParkingComplexModel> complexes = new();
+    private List<ParkingSpotModel> spots = new();
+    private List<ParkingSessionModel> activeSessions = new();
+    private List<SubscriptionModel> userSubscriptions = new();
+    private List<string> notifications = new();
+
+    private int selectedUserId;
+    private int selectedComplexId;
+    private int joinedComplexId;
+    private int durationHours = 1;
+    private int durationMinutes;
+    private int selectedSubscriptionId;
+    private string paymentMethod = TerminalPayment;
+    private string guestLicensePlate = "";
+    private string sessionSearch = "";
+    private string? message;
+    private bool isSuccess;
+    private bool isLoading = true;
+    private bool isEntrySubmitting;
+    private bool showPaymentModal;
+
+    private bool IsCurrentUserClient => UserService.CurrentUser?.role_id == 3;
+    private bool IsStaff => UserService.CurrentUser?.role_id == 1 || UserService.CurrentUser?.role_id == 2;
+    private bool IsGuest => UserService.CurrentUser == null;
+    private int FreeSpotsCount => spots.Count(IsFree);
+    private int BusySpotsCount => spots.Count(x => !IsFree(x));
+    private int DurationTotalMinutes => Math.Max(0, durationHours * 60 + durationMinutes);
+    private decimal ParkingPrice => Math.Round(DurationTotalMinutes * HourPrice / 60m, 2);
+    private string SelectedComplexName => complexes.FirstOrDefault(x => x.id_complex == selectedComplexId)?.name ?? "";
+    private string EntryModeText => IsGuest
+        ? "Гостевой въезд: введите номер автомобиля и оплатите через терминал"
+        : IsCurrentUserClient
+            ? "Выберите свой автомобиль и способ оплаты"
+            : "Режим администратора: выберите пользователя, автомобиль и место";
+    private string EntryPeriodText => $"{durationHours} ч {durationMinutes} мин, с {DateTime.Now:HH:mm} по {DateTime.Now.AddMinutes(DurationTotalMinutes):HH:mm}";
+
+    private bool CanUseSubscriptionPayment => !IsGuest && AvailableSubscriptions.Any();
+    private string SelectedSpotTitle => spots.FirstOrDefault(x => x.id_spot == entryForm.parking_spot_id) is { } spot
+        ? $"Место {spot.number}"
+        : "Не выбрано";
+    private string PaymentCarTitle => IsGuest
+        ? guestLicensePlate.Trim().ToUpperInvariant()
+        : selectedUserCars.FirstOrDefault(x => x.id_car == entryForm.car_id) is { } car
+            ? GetCarTitle(car)
+            : "Не выбрано";
+    private string PaymentMethodTitle => paymentMethod == SubscriptionPayment ? "Абонемент" : "Терминал";
+    private string SelectedSubscriptionDescription => AvailableSubscriptions.FirstOrDefault(x => x.id_subscription == selectedSubscriptionId) is { } subscription
+        ? GetSubscriptionTitle(subscription)
+        : "Доступен для комплекса";
+
+    private IEnumerable<ParkingSpotModel> FreeSpots => spots.Where(IsFree);
+
+    private IEnumerable<SubscriptionModel> AvailableSubscriptions => userSubscriptions
+        .Where(x => x.subscriptionPlan?.parking_complex_id == selectedComplexId
+            && x.end_date >= DateOnly.FromDateTime(DateTime.Now)
+            && x.status == "Активно");
+
+    private IEnumerable<ParkingSessionModel> FilteredSessions => activeSessions
+        .Where(x => !IsGuest)
+        .Where(x => !IsCurrentUserClient || x.user_id == UserService.CurrentUser?.id_user)
+        .Where(x => string.IsNullOrWhiteSpace(sessionSearch)
+            || (x.car?.license_plate?.Contains(sessionSearch, StringComparison.OrdinalIgnoreCase) ?? false))
+        .OrderByDescending(x => x.entry_time);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UserRequests.LoadUserFromToken();
+        await ReloadData();
+
+        RealtimeService.SpotChanged += OnRealtimeSpotChanged;
+        RealtimeService.ComplexChanged += OnRealtimeComplexChanged;
+        RealtimeService.NotificationReceived += OnRealtimeNotification;
+
+        await RealtimeService.Connect();
+
+        if (UserService.CurrentUser != null)
+            await RealtimeService.JoinUserNotifications(UserService.CurrentUser.id_user);
+    }
+
+    private async Task ReloadData()
+    {
+        isLoading = true;
+        message = null;
+
+        if (IsGuest)
+        {
+            users.Clear();
+            selectedUserId = 0;
+            selectedUserCars.Clear();
+            userSubscriptions.Clear();
+        }
+        else if (IsCurrentUserClient && UserService.CurrentUser != null)
+        {
+            users = new List<UserModel> { UserService.CurrentUser };
+            selectedUserId = UserService.CurrentUser.id_user;
+            await OnUserChanged();
+        }
+        else
+        {
+            var usersResult = await UserRequests.GetAllUser();
+            users = usersResult?.status == true ? usersResult.list : new List<UserModel>();
+
+            if (selectedUserId != 0)
+                await OnUserChanged();
+        }
+
+        var complexesResult = await ParkingRequests.GetAllComplexes();
+        complexes = complexesResult?.status == true ? complexesResult.list : new List<ParkingComplexModel>();
+
+        var sessionsResult = await ParkingSessionRequests.GetActiveSessions();
+        activeSessions = sessionsResult?.status == true ? sessionsResult.list : new List<ParkingSessionModel>();
+
+        if (selectedComplexId != 0)
+            await LoadSpots();
+
+        EnsurePaymentMethod();
+        isLoading = false;
+    }
+
+    private async Task OnUserChanged()
+    {
+        entryForm.user_id = selectedUserId;
+        entryForm.car_id = 0;
+        entryForm.subscription_id = null;
+        selectedSubscriptionId = 0;
+
+        selectedUserCars.Clear();
+        userSubscriptions.Clear();
+
+        if (selectedUserId == 0)
+        {
+            EnsurePaymentMethod();
+            return;
+        }
+
+        var carsResult = await CarRequests.GetCarsByUser(selectedUserId);
+        selectedUserCars = carsResult?.status == true ? carsResult.list : new List<CarModel>();
+
+        var subscriptionsResult = await SubscriptionRequests.GetSubscriptionsByUser(selectedUserId);
+        userSubscriptions = subscriptionsResult?.status == true ? subscriptionsResult.list : new List<SubscriptionModel>();
+
+        SelectFirstAvailableSubscription();
+        EnsurePaymentMethod();
+    }
+
+    private async Task OnComplexChanged()
+    {
+        if (joinedComplexId != 0)
+            await RealtimeService.LeaveParkingComplex(joinedComplexId);
+
+        entryForm.parking_complex_id = selectedComplexId;
+        entryForm.parking_spot_id = 0;
+        entryForm.subscription_id = null;
+        selectedSubscriptionId = 0;
+
+        await LoadSpots();
+
+        if (selectedComplexId != 0)
+        {
+            await RealtimeService.Connect();
+            await RealtimeService.JoinParkingComplex(selectedComplexId);
+            joinedComplexId = selectedComplexId;
+        }
+
+        SelectFirstAvailableSubscription();
+        EnsurePaymentMethod();
+    }
+
+    private async Task LoadSpots()
+    {
+        if (selectedComplexId == 0)
+        {
+            spots.Clear();
+            return;
+        }
+
+        var spotsResult = await ParkingRequests.GetSpotsByComplex(selectedComplexId);
+        spots = spotsResult?.status == true ? spotsResult.list : new List<ParkingSpotModel>();
+    }
+
+    private void OpenPaymentModal()
+    {
+        message = null;
+        NormalizeDuration();
+
+        if (selectedComplexId == 0 || entryForm.parking_spot_id == 0)
+        {
+            SetError("Выберите парковочный комплекс и свободное место");
+            return;
+        }
+
+        if (DurationTotalMinutes <= 0)
+        {
+            SetError("Укажите длительность парковки");
+            return;
+        }
+
+        if (IsGuest)
+        {
+            if (string.IsNullOrWhiteSpace(guestLicensePlate))
+            {
+                SetError("Введите госномер автомобиля");
+                return;
+            }
+        }
+        else
+        {
+            if (selectedUserId == 0 || entryForm.car_id == 0)
+            {
+                SetError("Выберите пользователя и автомобиль");
+                return;
+            }
+
+            if (IsCurrentUserClient && selectedUserId != UserService.CurrentUser?.id_user)
+            {
+                SetError("Вы можете оформить парковку только для себя");
+                return;
+            }
+
+            if (paymentMethod == SubscriptionPayment && selectedSubscriptionId == 0)
+            {
+                SetError("Выберите действующий абонемент");
+                return;
+            }
+        }
+
+        showPaymentModal = true;
+    }
+
+    private void ClosePaymentModal()
+    {
+        if (!isEntrySubmitting)
+            showPaymentModal = false;
+    }
+
+    private async Task StartEntry()
+    {
+        message = null;
+        isEntrySubmitting = true;
+
+        try
+        {
+            NormalizeDuration();
+
+            if (selectedComplexId == 0 || entryForm.parking_spot_id == 0)
+            {
+                SetError("Выберите парковочный комплекс и свободное место");
+                return;
+            }
+
+            if (DurationTotalMinutes <= 0)
+            {
+                SetError("Укажите длительность парковки");
+                return;
+            }
+
+            if (IsGuest)
+            {
+                await StartGuestEntry();
+                return;
+            }
+
+            if (selectedUserId == 0 || entryForm.car_id == 0)
+            {
+                SetError("Выберите пользователя и автомобиль");
+                return;
+            }
+
+            if (IsCurrentUserClient && selectedUserId != UserService.CurrentUser?.id_user)
+            {
+                SetError("Вы можете оформить парковку только для себя");
+                return;
+            }
+
+            var sessionRequest = new CreateSessionRequest
+            {
+                user_id = selectedUserId,
+                car_id = entryForm.car_id,
+                parking_complex_id = selectedComplexId,
+                parking_spot_id = entryForm.parking_spot_id,
+                subscription_id = paymentMethod == SubscriptionPayment ? selectedSubscriptionId : null,
+                duration_minutes = DurationTotalMinutes
+            };
+
+            if (paymentMethod == SubscriptionPayment && sessionRequest.subscription_id == null)
+            {
+                SetError("Выберите действующий абонемент");
+                return;
+            }
+
+            var result = await ParkingSessionRequests.CreateSession(sessionRequest);
+            await HandleEntryResult(result, paymentMethod == SubscriptionPayment ? "Парковка оформлена по абонементу" : $"Терминал: оплата {ParkingPrice:0.##} ₽ принята");
+        }
+        finally
+        {
+            isEntrySubmitting = false;
+        }
+    }
+
+    private async Task StartGuestEntry()
+    {
+        if (string.IsNullOrWhiteSpace(guestLicensePlate))
+        {
+            SetError("Введите госномер автомобиля");
+            return;
+        }
+
+        var result = await ParkingSessionRequests.CreateGuestSession(new GuestSessionRequest
+        {
+            license_plate = guestLicensePlate.Trim(),
+            parking_complex_id = selectedComplexId,
+            parking_spot_id = entryForm.parking_spot_id,
+            duration_minutes = DurationTotalMinutes
+        });
+
+        await HandleEntryResult(result, $"Терминал: оплата {ParkingPrice:0.##} ₽ принята");
+    }
+
+    private async Task HandleEntryResult(ParkingSessionResponse? result, string successMessage)
+    {
+        if (result == null || !result.status)
+        {
+            SetError(result?.message ?? "Не удалось оформить парковку");
+            return;
+        }
+
+        isSuccess = true;
+        message = result.message ?? successMessage;
+
+        entryForm.car_id = 0;
+        entryForm.parking_spot_id = 0;
+        entryForm.subscription_id = null;
+        selectedSubscriptionId = 0;
+
+        if (IsGuest)
+            guestLicensePlate = "";
+
+        if (UserService.CurrentUser != null)
+            await RealtimeService.CheckParkingSessionWarnings(UserService.CurrentUser.id_user);
+
+        showPaymentModal = false;
+        await ReloadData();
+    }
+
+    private async Task CloseSession(int sessionId)
+    {
+        var session = activeSessions.FirstOrDefault(x => x.id_session == sessionId);
+
+        if (!CanCloseSession(session))
+        {
+            SetError("Вы можете фиксировать выезд только для своих машин");
+            return;
+        }
+
+        var result = await ParkingSessionRequests.CloseSession(sessionId);
+
+        if (result == null || !result.status)
+        {
+            SetError(result?.message ?? "Не удалось зафиксировать выезд");
+            return;
+        }
+
+        isSuccess = true;
+        message = result.message ?? "Выезд зафиксирован";
+
+        await ReloadData();
+    }
+
+    private void SelectPayment(string method)
+    {
+        paymentMethod = method;
+        EnsurePaymentMethod();
+    }
+
+    private void EnsurePaymentMethod()
+    {
+        if (!CanUseSubscriptionPayment && paymentMethod == SubscriptionPayment)
+            paymentMethod = TerminalPayment;
+
+        if (paymentMethod == SubscriptionPayment && selectedSubscriptionId == 0)
+            SelectFirstAvailableSubscription();
+    }
+
+    private void SelectFirstAvailableSubscription()
+    {
+        selectedSubscriptionId = AvailableSubscriptions.FirstOrDefault()?.id_subscription ?? 0;
+    }
+
+    private void NormalizeDuration()
+    {
+        durationHours = Math.Clamp(durationHours, 0, 24);
+        durationMinutes = Math.Clamp(durationMinutes, 0, 59);
+    }
+
+    private void SetError(string text)
+    {
+        isSuccess = false;
+        message = text;
+    }
+
+    private bool CanCloseSession(ParkingSessionModel? session)
+    {
+        if (session == null || IsGuest)
+            return false;
+
+        if (IsStaff)
+            return true;
+
+        return IsCurrentUserClient && session.user_id == UserService.CurrentUser?.id_user;
+    }
+
+    private void OnRealtimeSpotChanged(ParkingSpotModel changedSpot, string changeType)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            var existing = spots.FirstOrDefault(x => x.id_spot == changedSpot.id_spot);
+
+            if (changeType == "deleted")
+            {
+                if (existing != null)
+                    spots.Remove(existing);
+            }
+            else if (existing == null)
+            {
+                spots.Add(changedSpot);
+            }
+            else
+            {
+                existing.number = changedSpot.number;
+                existing.status = changedSpot.status;
+                existing.parking_complex_id = changedSpot.parking_complex_id;
+            }
+
+            var sessionsResult = await ParkingSessionRequests.GetActiveSessions();
+            activeSessions = sessionsResult?.status == true ? sessionsResult.list : new List<ParkingSessionModel>();
+
+            StateHasChanged();
+        });
+    }
+
+    private void OnRealtimeComplexChanged(int complexId)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            if (selectedComplexId == complexId)
+                await LoadSpots();
+
+            StateHasChanged();
+        });
+    }
+
+    private void OnRealtimeNotification(string notification)
+    {
+        _ = InvokeAsync(() =>
+        {
+            if (!notifications.Contains(notification))
+                notifications.Insert(0, notification);
+
+            StateHasChanged();
+        });
+    }
+
+    private static bool IsFree(ParkingSpotModel spot)
+    {
+        return spot.status.Equals("Свободно", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string GetUserTitle(UserModel user)
+    {
+        return $"{user.name} {user.surname} - {user.email} - {user.phone}";
+    }
+
+    private static string GetCarTitle(CarModel car)
+    {
+        var title = $"{car.license_plate} - {car.brand} {car.model}".Trim();
+        return title;
+    }
+
+    private static string GetSubscriptionTitle(SubscriptionModel subscription)
+    {
+        var place = subscription.subscriptionPlan?.parkingComplex?.name ?? "парковка";
+        return $"{place} до {subscription.end_date:dd.MM.yyyy}";
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        RealtimeService.SpotChanged -= OnRealtimeSpotChanged;
+        RealtimeService.ComplexChanged -= OnRealtimeComplexChanged;
+        RealtimeService.NotificationReceived -= OnRealtimeNotification;
+
+        if (joinedComplexId != 0)
+            await RealtimeService.LeaveParkingComplex(joinedComplexId);
+    }
+}

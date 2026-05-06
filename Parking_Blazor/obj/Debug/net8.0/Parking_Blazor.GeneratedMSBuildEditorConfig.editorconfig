@@ -34,6 +34,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYXJraW5nUGFnZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/study/KTITS/uchebka/Parking_Blazor/Parking_Blazor/Pages/AdminReportsPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5SZXBvcnRzUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/study/KTITS/uchebka/Parking_Blazor/Parking_Blazor/Pages/AuthPage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFBhZ2UucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -42,8 +46,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/study/KTITS/uchebka/Parking_Blazor/Parking_Blazor/Pages/ParkingHistoryPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGFya2luZ0hpc3RvcnlQYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/study/KTITS/uchebka/Parking_Blazor/Parking_Blazor/Pages/Profile.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/study/KTITS/uchebka/Parking_Blazor/Parking_Blazor/Pages/SubscriptionsPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3Vic2NyaXB0aW9uc1BhZ2UucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/study/KTITS/uchebka/Parking_Blazor/Parking_Blazor/_Imports.razor]

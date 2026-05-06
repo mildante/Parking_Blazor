@@ -25,6 +25,9 @@ namespace Parking_Blazor.ApiRequests.Services
         public async Task<CarResponse?> CreateCar(CarModel carModel)
         {
             var response = await _httpClient.PostAsJsonAsync("/createCar", carModel);
+            if (!response.IsSuccessStatusCode)
+                return new CarResponse { status = false, message = "Не удалось добавить машину" };
+
             return await response.Content.ReadFromJsonAsync<CarResponse>();
         }
 

@@ -24,7 +24,7 @@ namespace Parking_Blazor.ApiRequests.Models
             public SubscriptionPlanModel? subscriptionPlan { get; set; }
             public DateOnly start_date { get; set; }
             public DateOnly end_date { get; set; }
-            public string status { get; set; } = "active";
+            public string status { get; set; } = "Активно";
         }
 
         public class PlanListResponse

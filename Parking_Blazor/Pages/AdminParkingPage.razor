@@ -1,9 +1,13 @@
 ﻿@page "/admin-parking"
+@implements IAsyncDisposable
 @using Parking_Blazor.ApiRequests.Models
 @using Parking_Blazor.ApiRequests.Services
 @using static Parking_Blazor.ApiRequests.Models.Parking
+@using static Parking_Blazor.ApiRequests.Models.Subscription
 
 @inject ParkingRequests ParkingRequests
+@inject SubscriptionRequests SubscriptionRequests
+@inject ParkingRealtimeService RealtimeService
 @inject UserService UserService
 @inject NavigationManager Navigation
 
@@ -103,6 +107,33 @@ else
                 }
                 else
                 {
+                    <div class="admin-spot-overview">
+                        <div class="admin-spot-stats">
+                            <div>
+                                <span>Свободно</span>
+                                <strong>@FreeSpotsCount</strong>
+                            </div>
+                            <div>
+                                <span>Занято</span>
+                                <strong>@BusySpotsCount</strong>
+                            </div>
+                            <div>
+                                <span>Всего</span>
+                                <strong>@spots.Count</strong>
+                            </div>
+                        </div>
+
+                        <div class="parking-spot-grid admin-spot-grid">
+                            @foreach (var spot in spots.OrderBy(x => x.number))
+                            {
+                                <div class="parking-spot-tile @GetStatusClass(spot.status)">
+                                    <span>@spot.number</span>
+                                    <strong>@spot.status</strong>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
                     <div class="parking-table-wrap">
                         <table class="parking-table">
                             <thead>
@@ -127,6 +158,61 @@ else
                                         <td class="table-actions">
                                             <button @onclick="() => OpenEditSpot(spot)">Изменить</button>
                                             <button class="delete" @onclick="() => DeleteSpot(spot.id_spot)">Удалить</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </section>
+
+            <section class="parking-card">
+                <div class="parking-card-title">
+                    <div>
+                        <h2>Тарифы</h2>
+                        <p>@(selectedComplex == null ? "Выберите комплекс" : selectedComplex.name)</p>
+                    </div>
+
+                    <button class="parking-small-btn" disabled="@(selectedComplex == null)" @onclick="OpenCreatePlan">
+                        + Добавить тариф
+                    </button>
+                </div>
+
+                @if (selectedComplex == null)
+                {
+                    <div class="parking-empty">Сначала выберите парковочный комплекс слева.</div>
+                }
+                else if (isLoadingPlans)
+                {
+                    <div class="parking-empty">Загрузка тарифов...</div>
+                }
+                else if (plans.Count == 0)
+                {
+                    <div class="parking-empty">Для этого комплекса тарифы пока не добавлены.</div>
+                }
+                else
+                {
+                    <div class="parking-table-wrap">
+                        <table class="parking-table">
+                            <thead>
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Срок</th>
+                                    <th>Цена</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var plan in plans)
+                                {
+                                    <tr>
+                                        <td>@plan.name</td>
+                                        <td>@plan.duration_days дней</td>
+                                        <td>@plan.price.ToString("0.##") ₽</td>
+                                        <td class="table-actions">
+                                            <button @onclick="() => OpenEditPlan(plan)">Изменить</button>
+                                            <button class="delete" @onclick="() => DeletePlan(plan.id_plan)">Удалить</button>
                                         </td>
                                     </tr>
                                 }
@@ -187,6 +273,31 @@ else
             </div>
         </div>
     }
+
+    @if (isPlanModalOpen)
+    {
+        <div class="parking-modal-backdrop">
+            <div class="parking-modal">
+                <button class="modal-close" @onclick="ClosePlanModal">×</button>
+
+                <h2>@(isEditPlanMode ? "Редактирование тарифа" : "Добавление тарифа")</h2>
+
+                <label>Название</label>
+                <input @bind="planForm.name" />
+
+                <label>Срок действия, дней</label>
+                <input type="number" min="1" @bind="planForm.duration_days" />
+
+                <label>Цена</label>
+                <input type="number" min="0" step="0.01" @bind="planForm.price" />
+
+                <div class="modal-actions">
+                    <button class="secondary" @onclick="ClosePlanModal">Отмена</button>
+                    <button @onclick="SavePlan">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @code {
@@ -194,14 +305,17 @@ else
 
     private List<ParkingComplexModel> complexes = new();
     private List<ParkingSpotModel> spots = new();
+    private List<SubscriptionPlanModel> plans = new();
 
     private ParkingComplexModel? selectedComplex;
 
     private ParkingComplexModel complexForm = new();
     private ParkingSpotModel spotForm = new();
+    private SubscriptionPlanModel planForm = new();
 
     private bool isLoadingComplexes;
     private bool isLoadingSpots;
+    private bool isLoadingPlans;
 
     private bool isComplexModalOpen;
     private bool isEditComplexMode;
@@ -209,8 +323,15 @@ else
     private bool isSpotModalOpen;
     private bool isEditSpotMode;
 
+    private bool isPlanModalOpen;
+    private bool isEditPlanMode;
+
     private string? message;
     private bool isSuccess;
+    private int joinedComplexId;
+
+    private int FreeSpotsCount => spots.Count(x => IsFreeStatus(x.status));
+    private int BusySpotsCount => spots.Count(x => IsBusyStatus(x.status));
 
     protected override async Task OnInitializedAsync()
     {
@@ -218,6 +339,10 @@ else
 
         if (UserService.CurrentUser == null || !UserService.isAdmin)
             return;
+
+        RealtimeService.SpotChanged += OnRealtimeSpotChanged;
+        RealtimeService.ComplexChanged += OnRealtimeComplexChanged;
+        await RealtimeService.Connect();
 
         await LoadComplexes();
     }
@@ -237,8 +362,16 @@ else
 
     private async Task SelectComplex(ParkingComplexModel complex)
     {
+        if (joinedComplexId != 0 && joinedComplexId != complex.id_complex)
+            await RealtimeService.LeaveParkingComplex(joinedComplexId);
+
         selectedComplex = complex;
         await LoadSpots();
+        await LoadPlans();
+
+        await RealtimeService.Connect();
+        await RealtimeService.JoinParkingComplex(complex.id_complex);
+        joinedComplexId = complex.id_complex;
     }
 
     private async Task LoadSpots()
@@ -255,6 +388,22 @@ else
             : new List<ParkingSpotModel>();
 
         isLoadingSpots = false;
+    }
+
+    private async Task LoadPlans()
+    {
+        if (selectedComplex == null)
+            return;
+
+        isLoadingPlans = true;
+
+        var result = await SubscriptionRequests.GetPlansByComplex(selectedComplex.id_complex);
+
+        plans = result != null && result.status
+            ? result.list
+            : new List<SubscriptionPlanModel>();
+
+        isLoadingPlans = false;
     }
 
     private void OpenCreateComplex()
@@ -330,6 +479,12 @@ else
 
         if (selectedComplex?.id_complex == id)
         {
+            if (joinedComplexId == id)
+            {
+                await RealtimeService.LeaveParkingComplex(joinedComplexId);
+                joinedComplexId = 0;
+            }
+
             selectedComplex = null;
             spots.Clear();
         }
@@ -433,17 +588,171 @@ else
         StateHasChanged();
     }
 
+    private void OpenCreatePlan()
+    {
+        if (selectedComplex == null)
+            return;
+
+        isEditPlanMode = false;
+
+        planForm = new SubscriptionPlanModel
+        {
+            parking_complex_id = selectedComplex.id_complex,
+            duration_days = 30
+        };
+
+        isPlanModalOpen = true;
+    }
+
+    private void OpenEditPlan(SubscriptionPlanModel plan)
+    {
+        isEditPlanMode = true;
+
+        planForm = new SubscriptionPlanModel
+        {
+            id_plan = plan.id_plan,
+            name = plan.name,
+            duration_days = plan.duration_days,
+            price = plan.price,
+            parking_complex_id = plan.parking_complex_id
+        };
+
+        isPlanModalOpen = true;
+    }
+
+    private async Task SavePlan()
+    {
+        message = null;
+
+        if (selectedComplex == null)
+            return;
+
+        if (string.IsNullOrWhiteSpace(planForm.name) || planForm.duration_days <= 0 || planForm.price < 0)
+        {
+            isSuccess = false;
+            message = "Введите название, срок и цену тарифа";
+            return;
+        }
+
+        planForm.parking_complex_id = selectedComplex.id_complex;
+
+        var result = isEditPlanMode
+            ? await SubscriptionRequests.UpdatePlan(planForm)
+            : await SubscriptionRequests.CreatePlan(planForm);
+
+        if (result == null || !result.status)
+        {
+            isSuccess = false;
+            message = result?.message ?? "Не удалось сохранить тариф";
+            return;
+        }
+
+        await LoadPlans();
+        ClosePlanModal();
+
+        isSuccess = true;
+        message = result.message ?? "Тариф сохранён";
+    }
+
+    private async Task DeletePlan(int id)
+    {
+        var result = await SubscriptionRequests.DeletePlan(id);
+
+        if (result == null || !result.status)
+        {
+            isSuccess = false;
+            message = result?.message ?? "Не удалось удалить тариф";
+            return;
+        }
+
+        plans.RemoveAll(x => x.id_plan == id);
+
+        isSuccess = true;
+        message = result.message ?? "Тариф удалён";
+    }
+
+    private void ClosePlanModal()
+    {
+        isPlanModalOpen = false;
+    }
+
+    private void OnRealtimeSpotChanged(ParkingSpotModel changedSpot, string changeType)
+    {
+        _ = InvokeAsync(() =>
+        {
+            if (selectedComplex == null || changedSpot.parking_complex_id != selectedComplex.id_complex)
+                return;
+
+            var existingSpot = spots.FirstOrDefault(x => x.id_spot == changedSpot.id_spot);
+
+            if (changeType == "deleted")
+            {
+                if (existingSpot != null)
+                    spots.Remove(existingSpot);
+            }
+            else if (existingSpot == null)
+            {
+                spots.Add(changedSpot);
+            }
+            else
+            {
+                existingSpot.number = changedSpot.number;
+                existingSpot.status = changedSpot.status;
+                existingSpot.parking_complex_id = changedSpot.parking_complex_id;
+            }
+
+            StateHasChanged();
+        });
+    }
+
+    private void OnRealtimeComplexChanged(int complexId)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await LoadComplexes();
+
+            if (selectedComplex?.id_complex == complexId)
+            {
+                selectedComplex = complexes.FirstOrDefault(x => x.id_complex == complexId) ?? selectedComplex;
+                await LoadSpots();
+            }
+
+            StateHasChanged();
+        });
+    }
+
     private string GetStatusClass(string status)
     {
-        return status switch
-        {
-            "Свободно" => "free",
-            "Занято" => "busy"
-        };
+        if (IsFreeStatus(status))
+            return "free";
+
+        if (IsBusyStatus(status))
+            return "busy";
+
+        return "reserved";
+    }
+
+    private static bool IsFreeStatus(string status)
+    {
+        return status.Equals("Свободно", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsBusyStatus(string status)
+    {
+        return status.Equals("Занято", StringComparison.OrdinalIgnoreCase);
     }
 
     private void GoToAuth()
     {
         Navigation.NavigateTo("/auth");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        RealtimeService.SpotChanged -= OnRealtimeSpotChanged;
+        RealtimeService.ComplexChanged -= OnRealtimeComplexChanged;
+
+        if (joinedComplexId != 0)
+            await RealtimeService.LeaveParkingComplex(joinedComplexId);
     }
 }

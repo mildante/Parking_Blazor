@@ -1,0 +1,321 @@
+@page "/subscriptions"
+@using Parking_Blazor.ApiRequests.Models
+@using Parking_Blazor.ApiRequests.Services
+@using static Parking_Blazor.ApiRequests.Models.Parking
+@using static Parking_Blazor.ApiRequests.Models.Subscription
+
+@inject UserService UserService
+@inject UserRequests UserRequests
+@inject ParkingRequests ParkingRequests
+@inject SubscriptionRequests SubscriptionRequests
+@inject NavigationManager Navigation
+
+<PageTitle>Абонементы</PageTitle>
+
+<div class="subscriptions-page">
+    <section class="subscriptions-header">
+        <div>
+            <span class="profile-pill">Parking plans</span>
+            <h1>Абонементы</h1>
+            <p>@(IsAdmin ? "Просмотр абонементов пользователей" : "Выберите тариф парковочного комплекса и управляйте своими абонементами")</p>
+        </div>
+
+        <button class="small-primary-btn" @onclick="ReloadData">Обновить</button>
+    </section>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="profile-message @(isSuccess ? "success" : "error")">
+            @message
+        </div>
+    }
+
+    @if (isLoading)
+    {
+        <section class="profile-card">
+            <p class="empty-text">Загрузка...</p>
+        </section>
+    }
+    else if (UserService.CurrentUser == null)
+    {
+        <section class="profile-card subscriptions-auth-card">
+            <div class="card-title">
+                <h2>Нужна авторизация</h2>
+                <p>Войдите в аккаунт, чтобы оформлять и просматривать абонементы.</p>
+            </div>
+
+            <button class="primary-btn" @onclick="GoToAuth">Войти</button>
+        </section>
+    }
+    else if (IsAdmin)
+    {
+        <section class="profile-card">
+            <div class="card-title row-title">
+                <div>
+                    <h2>Абонементы пользователей</h2>
+                    <p>Все оформленные абонементы в системе</p>
+                </div>
+                <span class="subscriptions-count">@allSubscriptions.Count</span>
+            </div>
+
+            <div class="form-group full subscription-search">
+                <label>Поиск</label>
+                <input class="profile-input" placeholder="Пользователь, почта, телефон или парковка" @bind="subscriptionSearch" @bind:event="oninput" />
+            </div>
+
+            @if (!FilteredAdminSubscriptions.Any())
+            {
+                <p class="empty-text">Абонементы не найдены.</p>
+            }
+            else
+            {
+                <div class="parking-table-wrap">
+                    <table class="parking-table">
+                        <thead>
+                            <tr>
+                                <th>Пользователь</th>
+                                <th>Комплекс</th>
+                                <th>Тариф</th>
+                                <th>Период</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var subscription in FilteredAdminSubscriptions)
+                            {
+                                <tr>
+                                    <td>@GetUserTitle(subscription)</td>
+                                    <td>@(subscription.subscriptionPlan?.parkingComplex?.name ?? "Парковка")</td>
+                                    <td>@(subscription.subscriptionPlan?.name ?? "Абонемент")</td>
+                                    <td>@subscription.start_date.ToString("dd.MM.yyyy") - @subscription.end_date.ToString("dd.MM.yyyy")</td>
+                                    <td><span class="status-badge @GetSubscriptionStatusClass(subscription)">@subscription.status</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    }
+    else
+    {
+        <div class="subscriptions-grid">
+            <section class="profile-card">
+                <div class="card-title">
+                    <h2>Оформить абонемент</h2>
+                    <p>Повторная покупка продлит действующий абонемент выбранного комплекса</p>
+                </div>
+
+                <div class="form-group full">
+                    <label>Парковочный комплекс</label>
+                    <select class="profile-input" @bind="selectedComplexId" @bind:after="OnComplexChanged">
+                        <option value="0">Выберите комплекс</option>
+                        @foreach (var complex in complexes)
+                        {
+                            <option value="@complex.id_complex">@complex.name</option>
+                        }
+                    </select>
+                </div>
+
+                @if (selectedComplexId == 0)
+                {
+                    <p class="empty-text subscriptions-empty-offset">Выберите комплекс, чтобы увидеть тарифы.</p>
+                }
+                else if (plans.Count == 0)
+                {
+                    <p class="empty-text subscriptions-empty-offset">Для выбранного комплекса тарифы пока не добавлены.</p>
+                }
+                else
+                {
+                    <div class="subscription-plan-grid subscriptions-plan-grid">
+                        @foreach (var plan in plans)
+                        {
+                            <div class="subscription-plan-card">
+                                <div>
+                                    <h3>@plan.name</h3>
+                                    <p>@plan.duration_days дней</p>
+                                    <strong>@plan.price.ToString("0.##") ₽</strong>
+                                </div>
+
+                                <button class="small-primary-btn" @onclick="() => BuySubscription(plan.id_plan)" disabled="@isBuying">
+                                    @(isBuying ? "Оформляем..." : "Оформить")
+                                </button>
+                            </div>
+                        }
+                    </div>
+                }
+            </section>
+
+            <section class="profile-card">
+                <div class="card-title">
+                    <h2>Мои абонементы</h2>
+                    <p>Действующие и завершенные покупки</p>
+                </div>
+
+                @if (mySubscriptions.Count == 0)
+                {
+                    <p class="empty-text">У вас пока нет абонементов.</p>
+                }
+                else
+                {
+                    <div class="subscription-owned-list subscriptions-owned-page-list">
+                        @foreach (var subscription in mySubscriptions.OrderByDescending(x => x.end_date))
+                        {
+                            <div class="subscription-owned-card">
+                                <div>
+                                    <h3>@(subscription.subscriptionPlan?.name ?? "Абонемент")</h3>
+                                    <p>@(subscription.subscriptionPlan?.parkingComplex?.name ?? "Парковка")</p>
+                                </div>
+                                <div class="subscription-owned-meta">
+                                    <span>до @subscription.end_date.ToString("dd.MM.yyyy")</span>
+                                    <small class="@GetSubscriptionStatusClass(subscription)">@subscription.status</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </section>
+        </div>
+    }
+</div>
+
+@code {
+    private List<ParkingComplexModel> complexes = new();
+    private List<SubscriptionPlanModel> plans = new();
+    private List<SubscriptionModel> mySubscriptions = new();
+    private List<SubscriptionModel> allSubscriptions = new();
+
+    private int selectedComplexId;
+    private string subscriptionSearch = "";
+    private string? message;
+    private bool isSuccess;
+    private bool isLoading = true;
+    private bool isBuying;
+
+    private bool IsAdmin => UserService.CurrentUser?.role_id == 1;
+
+    private IEnumerable<SubscriptionModel> FilteredAdminSubscriptions => allSubscriptions
+        .Where(x => string.IsNullOrWhiteSpace(subscriptionSearch)
+            || GetUserTitle(x).Contains(subscriptionSearch, StringComparison.OrdinalIgnoreCase)
+            || (x.subscriptionPlan?.parkingComplex?.name?.Contains(subscriptionSearch, StringComparison.OrdinalIgnoreCase) ?? false)
+            || (x.subscriptionPlan?.name?.Contains(subscriptionSearch, StringComparison.OrdinalIgnoreCase) ?? false))
+        .OrderByDescending(x => x.end_date);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UserRequests.LoadUserFromToken();
+        await ReloadData();
+    }
+
+    private async Task ReloadData()
+    {
+        isLoading = true;
+        message = null;
+
+        if (UserService.CurrentUser == null)
+        {
+            isLoading = false;
+            return;
+        }
+
+        if (IsAdmin)
+        {
+            var subscriptionsResult = await SubscriptionRequests.GetAllSubscriptions();
+            allSubscriptions = subscriptionsResult?.status == true ? subscriptionsResult.list : new List<SubscriptionModel>();
+        }
+        else
+        {
+            var complexesResult = await ParkingRequests.GetAllComplexes();
+            complexes = complexesResult?.status == true ? complexesResult.list : new List<ParkingComplexModel>();
+
+            var subscriptionsResult = await SubscriptionRequests.GetSubscriptionsByUser(UserService.CurrentUser.id_user);
+            mySubscriptions = subscriptionsResult?.status == true ? subscriptionsResult.list : new List<SubscriptionModel>();
+
+            if (selectedComplexId != 0)
+                await LoadPlans();
+        }
+
+        isLoading = false;
+    }
+
+    private async Task OnComplexChanged()
+    {
+        message = null;
+        await LoadPlans();
+    }
+
+    private async Task LoadPlans()
+    {
+        if (selectedComplexId == 0)
+        {
+            plans.Clear();
+            return;
+        }
+
+        var plansResult = await SubscriptionRequests.GetPlansByComplex(selectedComplexId);
+        plans = plansResult?.status == true ? plansResult.list : new List<SubscriptionPlanModel>();
+    }
+
+    private async Task BuySubscription(int planId)
+    {
+        if (UserService.CurrentUser == null)
+        {
+            SetError("Войдите в аккаунт, чтобы оформить абонемент");
+            return;
+        }
+
+        isBuying = true;
+        message = null;
+
+        try
+        {
+            var result = await SubscriptionRequests.CreateSubscription(new SubscriptionModel
+            {
+                user_id = UserService.CurrentUser.id_user,
+                subscription_plan_id = planId
+            });
+
+            if (result == null || !result.status)
+            {
+                SetError(result?.message ?? "Не удалось оформить абонемент");
+                return;
+            }
+
+            isSuccess = true;
+            message = result.message ?? "Абонемент оформлен";
+
+            var subscriptionsResult = await SubscriptionRequests.GetSubscriptionsByUser(UserService.CurrentUser.id_user);
+            mySubscriptions = subscriptionsResult?.status == true ? subscriptionsResult.list : new List<SubscriptionModel>();
+        }
+        finally
+        {
+            isBuying = false;
+        }
+    }
+
+    private void SetError(string text)
+    {
+        isSuccess = false;
+        message = text;
+    }
+
+    private void GoToAuth()
+    {
+        Navigation.NavigateTo("/auth");
+    }
+
+    private static string GetUserTitle(SubscriptionModel subscription)
+    {
+        var user = subscription.user;
+        return user == null
+            ? "Пользователь"
+            : $"{user.name} {user.surname} - {user.email} - {user.phone}";
+    }
+
+    private static string GetSubscriptionStatusClass(SubscriptionModel subscription)
+    {
+        return subscription.status == "Активно"
+            ? "free"
+            : "disabled";
+    }
+}

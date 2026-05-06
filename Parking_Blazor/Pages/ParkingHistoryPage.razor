@@ -1,0 +1,257 @@
+@page "/parking-history"
+@using Parking_Blazor.ApiRequests.Models
+@using Parking_Blazor.ApiRequests.Services
+@using static Parking_Blazor.ApiRequests.Models.ParkingSession
+
+@inject UserService UserService
+@inject UserRequests UserRequests
+@inject ParkingSessionRequests ParkingSessionRequests
+@inject NavigationManager Navigation
+
+<PageTitle>История парковок</PageTitle>
+
+<div class="history-page">
+    <section class="history-header">
+        <div>
+            <span class="profile-pill">Parking history</span>
+            <h1>История парковок</h1>
+            <p>@(IsAdmin ? "Все парковочные сессии пользователей" : "Ваши прошлые и текущие парковки")</p>
+        </div>
+
+        <button class="small-primary-btn" @onclick="ReloadData">Обновить</button>
+    </section>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="profile-message error">
+            @message
+        </div>
+    }
+
+    @if (isLoading)
+    {
+        <section class="profile-card">
+            <p class="empty-text">Загрузка...</p>
+        </section>
+    }
+    else if (UserService.CurrentUser == null)
+    {
+        <section class="profile-card history-auth-card">
+            <div class="card-title">
+                <h2>Нужна авторизация</h2>
+                <p>Войдите в аккаунт, чтобы посмотреть историю парковок.</p>
+            </div>
+
+            <button class="primary-btn" @onclick="GoToAuth">Войти</button>
+        </section>
+    }
+    else
+    {
+        <section class="profile-card">
+            <div class="card-title row-title">
+                <div>
+                    <h2>@(IsAdmin ? "Все парковки" : "Мои парковки")</h2>
+                    <p>@HistorySubtitle</p>
+                </div>
+                <span class="history-count">@FilteredSessions.Count()</span>
+            </div>
+
+            <div class="form-group full history-search">
+                <label>Поиск</label>
+                <input class="profile-input" placeholder="Номер авто, пользователь, комплекс или место" @bind="historySearch" @bind:event="oninput" />
+            </div>
+
+            @if (!FilteredSessions.Any())
+            {
+                <p class="empty-text">История парковок пока пустая.</p>
+            }
+            else if (IsAdmin)
+            {
+                <div class="parking-table-wrap">
+                    <table class="parking-table">
+                        <thead>
+                            <tr>
+                                <th>Пользователь</th>
+                                <th>Автомобиль</th>
+                                <th>Комплекс</th>
+                                <th>Место</th>
+                                <th>Въезд</th>
+                                <th>Окончание</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var session in FilteredSessions)
+                            {
+                                <tr>
+                                    <td>@GetUserTitle(session)</td>
+                                    <td>@GetCarTitle(session)</td>
+                                    <td>@(session.parkingComplex?.name ?? "Парковка")</td>
+                                    <td>@(session.parkingSpot?.number ?? "-")</td>
+                                    <td>@FormatDateTime(session.entry_time)</td>
+                                    <td>@FormatExitTime(session)</td>
+                                    <td><span class="status-badge @GetSessionStatusClass(session)">@GetSessionStatusText(session)</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="history-card-list">
+                    @foreach (var session in FilteredSessions)
+                    {
+                        <article class="history-card">
+                            <div class="history-card-main">
+                                <div>
+                                    <h3>@GetCarTitle(session)</h3>
+                                    <p>@(session.parkingComplex?.name ?? "Парковка"), место @(session.parkingSpot?.number ?? "-")</p>
+                                </div>
+                                <span class="status-badge @GetSessionStatusClass(session)">@GetSessionStatusText(session)</span>
+                            </div>
+
+                            <div class="history-card-meta">
+                                <div>
+                                    <span>Въезд</span>
+                                    <strong>@FormatDateTime(session.entry_time)</strong>
+                                </div>
+                                <div>
+                                    <span>@(IsBusy(session) ? "Оплачено до" : "Выезд")</span>
+                                    <strong>@FormatExitTime(session)</strong>
+                                </div>
+                                <div>
+                                    <span>Время</span>
+                                    <strong>@GetDurationText(session)</strong>
+                                </div>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+    }
+</div>
+
+@code {
+    private List<ParkingSessionModel> sessions = new();
+    private string historySearch = "";
+    private string? message;
+    private bool isLoading = true;
+
+    private bool IsAdmin => UserService.CurrentUser?.role_id == 1;
+    private string HistorySubtitle => IsAdmin
+        ? "Поиск доступен по пользователю, машине, комплексу и месту"
+        : "Здесь отображаются активные, завершенные и истекшие парковки";
+
+    private IEnumerable<ParkingSessionModel> FilteredSessions => sessions
+        .Where(x => string.IsNullOrWhiteSpace(historySearch)
+            || GetUserTitle(x).Contains(historySearch, StringComparison.OrdinalIgnoreCase)
+            || GetCarTitle(x).Contains(historySearch, StringComparison.OrdinalIgnoreCase)
+            || (x.parkingComplex?.name?.Contains(historySearch, StringComparison.OrdinalIgnoreCase) ?? false)
+            || (x.parkingSpot?.number?.Contains(historySearch, StringComparison.OrdinalIgnoreCase) ?? false))
+        .OrderByDescending(x => x.entry_time);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UserRequests.LoadUserFromToken();
+        await ReloadData();
+    }
+
+    private async Task ReloadData()
+    {
+        isLoading = true;
+        message = null;
+
+        if (UserService.CurrentUser == null)
+        {
+            sessions.Clear();
+            isLoading = false;
+            return;
+        }
+
+        ParkingSessionListResponse? result = IsAdmin
+            ? await ParkingSessionRequests.GetAllSessions()
+            : await ParkingSessionRequests.GetSessionsByUser(UserService.CurrentUser.id_user);
+
+        if (result == null || !result.status)
+        {
+            sessions.Clear();
+            message = result?.message ?? "Не удалось загрузить историю парковок";
+        }
+        else
+        {
+            sessions = result.list;
+        }
+
+        isLoading = false;
+    }
+
+    private void GoToAuth()
+    {
+        Navigation.NavigateTo("/auth");
+    }
+
+    private static bool IsBusy(ParkingSessionModel session)
+    {
+        return session.status.Equals("Активна", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string GetSessionStatusClass(ParkingSessionModel session)
+    {
+        return IsBusy(session) ? "busy" : "free";
+    }
+
+    private static string GetSessionStatusText(ParkingSessionModel session)
+    {
+        return session.status;
+    }
+
+    private static string GetUserTitle(ParkingSessionModel session)
+    {
+        var user = session.user;
+        return user == null
+            ? "Пользователь"
+            : $"{user.name} {user.surname} - {user.email} - {user.phone}";
+    }
+
+    private static string GetCarTitle(ParkingSessionModel session)
+    {
+        var car = session.car;
+        return car == null
+            ? "Автомобиль"
+            : $"{car.license_plate} - {car.brand} {car.model}".Trim();
+    }
+
+    private static string FormatDateTime(DateTime value)
+    {
+        return value.ToLocalTime().ToString("dd.MM.yyyy HH:mm");
+    }
+
+    private static string FormatExitTime(ParkingSessionModel session)
+    {
+        return session.exit_time?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? "-";
+    }
+
+    private static string GetDurationText(ParkingSessionModel session)
+    {
+        if (session.exit_time == null)
+            return "-";
+
+        var duration = session.exit_time.Value - session.entry_time;
+
+        if (duration.TotalMinutes < 1)
+            return "меньше минуты";
+
+        var hours = (int)duration.TotalHours;
+        var minutes = duration.Minutes;
+
+        if (hours == 0)
+            return $"{minutes} мин";
+
+        if (minutes == 0)
+            return $"{hours} ч";
+
+        return $"{hours} ч {minutes} мин";
+    }
+}

@@ -35,11 +35,6 @@ namespace Parking_Blazor.ApiRequests.Services
             return await response.Content.ReadFromJsonAsync<ParkingComplexResponse>();
         }
 
-        public async Task<ParkingSpotListResponse?> GetAllSpots()
-        {
-            return await _httpClient.GetFromJsonAsync<ParkingSpotListResponse>("/getAllSpots");
-        }
-
         public async Task<ParkingSpotListResponse?> GetSpotsByComplex(int complexId)
         {
             return await _httpClient.GetFromJsonAsync<ParkingSpotListResponse>($"/getSpotsByComplex/{complexId}");
