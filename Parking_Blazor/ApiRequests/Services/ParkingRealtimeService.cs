@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.SignalR.Client;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using static Parking_Blazor.ApiRequests.Models.Parking;
 
 namespace Parking_Blazor.ApiRequests.Services
@@ -82,6 +82,12 @@ namespace Parking_Blazor.ApiRequests.Services
         {
             if (_hubConnection?.State == HubConnectionState.Connected)
                 await _hubConnection.InvokeAsync("CheckParkingSessionWarnings", userId);
+        }
+
+        public async Task CheckExpiredSessions(int complexId)
+        {
+            if (_hubConnection?.State == HubConnectionState.Connected)
+                await _hubConnection.InvokeAsync("CheckExpiredSessions", complexId);
         }
 
         public async ValueTask DisposeAsync()

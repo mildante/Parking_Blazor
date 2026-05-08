@@ -1085,6 +1085,6 @@ D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed
 D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\r9je6pdgmg-{0}-mijj9hgwxx-mijj9hgwxx.gz
 D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\vrwn0d63dd-{0}-sdj7yxw0lr-sdj7yxw0lr.gz
 D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
-D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\z6ticlqjdg-{0}-7iuv9m0roc-7iuv9m0roc.gz
-D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\ll8a41h2x3-{0}-sa9vb23lek-sa9vb23lek.gz
-D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\bawz5d4qs8-{0}-dl6pn8chls-dl6pn8chls.gz
+D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\z6ticlqjdg-{0}-oi7mzzdqf3-oi7mzzdqf3.gz
+D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\ll8a41h2x3-{0}-3kkz9rubzt-3kkz9rubzt.gz
+D:\study\KTITS\uchebka\Parking_Blazor\Parking_Blazor\obj\Debug\net8.0\compressed\bawz5d4qs8-{0}-xnj5m13faa-xnj5m13faa.gz

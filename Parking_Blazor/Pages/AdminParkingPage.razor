@@ -329,6 +329,7 @@ else
     private string? message;
     private bool isSuccess;
     private int joinedComplexId;
+    private System.Threading.Timer? realtimeTimer;
 
     private int FreeSpotsCount => spots.Count(x => IsFreeStatus(x.status));
     private int BusySpotsCount => spots.Count(x => IsBusyStatus(x.status));
@@ -343,8 +344,23 @@ else
         RealtimeService.SpotChanged += OnRealtimeSpotChanged;
         RealtimeService.ComplexChanged += OnRealtimeComplexChanged;
         await RealtimeService.Connect();
+        StartRealtimeTimer();
 
         await LoadComplexes();
+    }
+
+    private void StartRealtimeTimer()
+    {
+        realtimeTimer = new System.Threading.Timer(_ =>
+        {
+            _ = InvokeAsync(CheckRealtimeUpdates);
+        }, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+    }
+
+    private async Task CheckRealtimeUpdates()
+    {
+        if (selectedComplex != null)
+            await RealtimeService.CheckExpiredSessions(selectedComplex.id_complex);
     }
 
     private async Task LoadComplexes()
@@ -749,6 +765,7 @@ else
 
     public async ValueTask DisposeAsync()
     {
+        realtimeTimer?.Dispose();
         RealtimeService.SpotChanged -= OnRealtimeSpotChanged;
         RealtimeService.ComplexChanged -= OnRealtimeComplexChanged;
 

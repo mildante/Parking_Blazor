@@ -375,6 +375,7 @@
     private bool isLoading = true;
     private bool isEntrySubmitting;
     private bool showPaymentModal;
+    private System.Threading.Timer? realtimeTimer;
 
     private bool IsCurrentUserClient => UserService.CurrentUser?.role_id == 3;
     private bool IsStaff => UserService.CurrentUser?.role_id == 1 || UserService.CurrentUser?.role_id == 2;
@@ -432,6 +433,32 @@
 
         if (UserService.CurrentUser != null)
             await RealtimeService.JoinUserNotifications(UserService.CurrentUser.id_user);
+
+        StartRealtimeTimer();
+    }
+    private void StartRealtimeTimer()
+    {
+        realtimeTimer = new System.Threading.Timer(_ =>
+        {
+            _ = InvokeAsync(CheckRealtimeUpdates);
+        }, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+    }
+
+    private async Task CheckRealtimeUpdates()
+    {
+        if (selectedComplexId != 0)
+            await RealtimeService.CheckExpiredSessions(selectedComplexId);
+
+        if (!IsGuest)
+        {
+            var sessionsResult = await ParkingSessionRequests.GetActiveSessions();
+            activeSessions = sessionsResult?.status == true ? sessionsResult.list : new List<ParkingSessionModel>();
+        }
+
+        if (UserService.CurrentUser != null)
+            await RealtimeService.CheckParkingSessionWarnings(UserService.CurrentUser.id_user);
+
+        StateHasChanged();
     }
 
     private async Task ReloadData()
@@ -841,6 +868,7 @@
 
     public async ValueTask DisposeAsync()
     {
+        realtimeTimer?.Dispose();
         RealtimeService.SpotChanged -= OnRealtimeSpotChanged;
         RealtimeService.ComplexChanged -= OnRealtimeComplexChanged;
         RealtimeService.NotificationReceived -= OnRealtimeNotification;

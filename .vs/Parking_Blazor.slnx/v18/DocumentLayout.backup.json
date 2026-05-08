@@ -3,80 +3,12 @@
   "WorkspaceRootPath": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\pages\\authpage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\pages\\authpage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\pages\\adminreportspage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\pages\\adminreportspage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\pages\\parkinghistorypage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\pages\\parkinghistorypage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\pages\\profile.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\pages\\profile.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\apirequests\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\apirequests\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\wwwroot\\css\\app.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\wwwroot\\css\\app.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\apirequests\\services\\userrequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\apirequests\\services\\userrequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\apirequests\\services\\parkingsessionrequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\apirequests\\services\\parkingsessionrequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\apirequests\\models\\parkingsession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\apirequests\\models\\parkingsession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\pages\\adminparkingpage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\pages\\adminparkingpage.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\layout\\navmenu.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\layout\\navmenu.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\apirequests\\services\\subscriptionrequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\apirequests\\services\\subscriptionrequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\apirequests\\services\\parkingrequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\apirequests\\services\\parkingrequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\apirequests\\services\\carrequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\apirequests\\services\\carrequests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\apirequests\\models\\subscription.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\apirequests\\models\\subscription.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|d:\\study\\ktits\\uchebka\\parking_blazor\\parking_blazor\\apirequests\\models\\car.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{42EA369D-5E4A-3923-958A-C72CBCDB31BF}|Parking_Blazor\\Parking_Blazor.csproj|solutionrelative:parking_blazor\\apirequests\\models\\car.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -86,19 +18,20 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ParkingHistoryPage.razor",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Pages\\ParkingHistoryPage.razor",
-              "RelativeDocumentMoniker": "Parking_Blazor\\Pages\\ParkingHistoryPage.razor",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Pages\\ParkingHistoryPage.razor",
-              "RelativeToolTip": "Parking_Blazor\\Pages\\ParkingHistoryPage.razor",
-              "ViewState": "AgIAANwAAAAAAAAAAAAUwJsAAAAFAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "AdminReportsPage.razor",
+              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Pages\\AdminReportsPage.razor",
+              "RelativeDocumentMoniker": "Parking_Blazor\\Pages\\AdminReportsPage.razor",
+              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Pages\\AdminReportsPage.razor",
+              "RelativeToolTip": "Parking_Blazor\\Pages\\AdminReportsPage.razor",
+              "ViewState": "AgIAAL0AAAAAAAAAAAAiwMUAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-05-06T09:16:12.227Z"
+              "WhenOpened": "2026-05-06T11:39:20.079Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -108,214 +41,9 @@
               "RelativeDocumentMoniker": "Parking_Blazor\\Pages\\Home.razor",
               "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Pages\\Home.razor",
               "RelativeToolTip": "Parking_Blazor\\Pages\\Home.razor",
-              "ViewState": "AgIAAIwBAAAAAAAAAAAIwJ0BAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAP0BAAAAAAAAAAAjwBECAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-05-04T15:47:59.803Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "User.cs",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Models\\User.cs",
-              "RelativeDocumentMoniker": "Parking_Blazor\\ApiRequests\\Models\\User.cs",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Models\\User.cs",
-              "RelativeToolTip": "Parking_Blazor\\ApiRequests\\Models\\User.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAgAAAAbAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T20:26:54.166Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "app.css",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\wwwroot\\css\\app.css",
-              "RelativeDocumentMoniker": "Parking_Blazor\\wwwroot\\css\\app.css",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\wwwroot\\css\\app.css",
-              "RelativeToolTip": "Parking_Blazor\\wwwroot\\css\\app.css",
-              "ViewState": "AgIAALsDAAAAAAAAAIAwwNQDAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-29T06:19:30.574Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "ParkingSessionRequests.cs",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Services\\ParkingSessionRequests.cs",
-              "RelativeDocumentMoniker": "Parking_Blazor\\ApiRequests\\Services\\ParkingSessionRequests.cs",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Services\\ParkingSessionRequests.cs",
-              "RelativeToolTip": "Parking_Blazor\\ApiRequests\\Services\\ParkingSessionRequests.cs",
-              "ViewState": "AgIAABEAAAAAAAAAAAAUwCAAAABXAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T20:33:41.111Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "UserRequests.cs",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Services\\UserRequests.cs",
-              "RelativeDocumentMoniker": "Parking_Blazor\\ApiRequests\\Services\\UserRequests.cs",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Services\\UserRequests.cs",
-              "RelativeToolTip": "Parking_Blazor\\ApiRequests\\Services\\UserRequests.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAA5wBUAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T20:32:40.038Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "AuthPage.razor",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Pages\\AuthPage.razor",
-              "RelativeDocumentMoniker": "Parking_Blazor\\Pages\\AuthPage.razor",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Pages\\AuthPage.razor*",
-              "RelativeToolTip": "Parking_Blazor\\Pages\\AuthPage.razor*",
-              "ViewState": "AgIAALMAAAAAAAAAAAAkwJMAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-28T20:35:58.37Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "NavMenu.razor",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Layout\\NavMenu.razor",
-              "RelativeDocumentMoniker": "Parking_Blazor\\Layout\\NavMenu.razor",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Layout\\NavMenu.razor",
-              "RelativeToolTip": "Parking_Blazor\\Layout\\NavMenu.razor",
-              "ViewState": "AgIAAAYAAAAAAAAAAIBJwBsAAABgAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-29T06:31:29.712Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Profile.razor",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Pages\\Profile.razor",
-              "RelativeDocumentMoniker": "Parking_Blazor\\Pages\\Profile.razor",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Pages\\Profile.razor",
-              "RelativeToolTip": "Parking_Blazor\\Pages\\Profile.razor",
-              "ViewState": "AgIAALMAAAAAAAAAAAAYwEIBAAAkAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-28T20:36:08.949Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "MainLayout.razor",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Layout\\MainLayout.razor",
-              "RelativeDocumentMoniker": "Parking_Blazor\\Layout\\MainLayout.razor",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Layout\\MainLayout.razor",
-              "RelativeToolTip": "Parking_Blazor\\Layout\\MainLayout.razor",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAEAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-29T10:15:10.945Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "AdminParkingPage.razor",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Pages\\AdminParkingPage.razor",
-              "RelativeDocumentMoniker": "Parking_Blazor\\Pages\\AdminParkingPage.razor",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Pages\\AdminParkingPage.razor",
-              "RelativeToolTip": "Parking_Blazor\\Pages\\AdminParkingPage.razor",
-              "ViewState": "AgIAAOABAAAAAAAAAAAqwIICAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-04-29T07:02:22.867Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ParkingSession.cs",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Models\\ParkingSession.cs",
-              "RelativeDocumentMoniker": "Parking_Blazor\\ApiRequests\\Models\\ParkingSession.cs",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Models\\ParkingSession.cs",
-              "RelativeToolTip": "Parking_Blazor\\ApiRequests\\Models\\ParkingSession.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAIAwwBsAAAAVAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T20:28:25.099Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Program.cs",
-              "RelativeDocumentMoniker": "Parking_Blazor\\Program.cs",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Program.cs",
-              "RelativeToolTip": "Parking_Blazor\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-29T07:24:23.228Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "NavMenu.razor.css",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Layout\\NavMenu.razor.css",
-              "RelativeDocumentMoniker": "Parking_Blazor\\Layout\\NavMenu.razor.css",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\Layout\\NavMenu.razor.css",
-              "RelativeToolTip": "Parking_Blazor\\Layout\\NavMenu.razor.css",
-              "ViewState": "AgIAAFEAAAAAAAAAAIBZwFcAAAAUAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-29T06:26:03.927Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "SubscriptionRequests.cs",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Services\\SubscriptionRequests.cs",
-              "RelativeDocumentMoniker": "Parking_Blazor\\ApiRequests\\Services\\SubscriptionRequests.cs",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Services\\SubscriptionRequests.cs",
-              "RelativeToolTip": "Parking_Blazor\\ApiRequests\\Services\\SubscriptionRequests.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAA9wFcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T20:33:24.621Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "ParkingRequests.cs",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Services\\ParkingRequests.cs",
-              "RelativeDocumentMoniker": "Parking_Blazor\\ApiRequests\\Services\\ParkingRequests.cs",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Services\\ParkingRequests.cs",
-              "RelativeToolTip": "Parking_Blazor\\ApiRequests\\Services\\ParkingRequests.cs",
-              "ViewState": "AgIAABQAAAAAAAAAAAAswEEAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T20:33:08.36Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "CarRequests.cs",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Services\\CarRequests.cs",
-              "RelativeDocumentMoniker": "Parking_Blazor\\ApiRequests\\Services\\CarRequests.cs",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Services\\CarRequests.cs",
-              "RelativeToolTip": "Parking_Blazor\\ApiRequests\\Services\\CarRequests.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T20:32:55.396Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "Subscription.cs",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Models\\Subscription.cs",
-              "RelativeDocumentMoniker": "Parking_Blazor\\ApiRequests\\Models\\Subscription.cs",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Models\\Subscription.cs",
-              "RelativeToolTip": "Parking_Blazor\\ApiRequests\\Models\\Subscription.cs",
-              "ViewState": "AgIAAA0AAAAAAAAAAAA2wDIAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T20:27:51.418Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "Car.cs",
-              "DocumentMoniker": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Models\\Car.cs",
-              "RelativeDocumentMoniker": "Parking_Blazor\\ApiRequests\\Models\\Car.cs",
-              "ToolTip": "D:\\study\\KTITS\\uchebka\\Parking_Blazor\\Parking_Blazor\\ApiRequests\\Models\\Car.cs",
-              "RelativeToolTip": "Parking_Blazor\\ApiRequests\\Models\\Car.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAowB8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T20:27:21.873Z"
             }
           ]
         }
